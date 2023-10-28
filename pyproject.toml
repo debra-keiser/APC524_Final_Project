@@ -22,7 +22,7 @@ testpaths = ["tests"]
 
 [tool.black]
 extend-exclude = [
-  *.txt|*.md|*.gr|*.cfg
+  .txt|.md|.gr|.cfg
 ]
 
 [tool.ruff]
