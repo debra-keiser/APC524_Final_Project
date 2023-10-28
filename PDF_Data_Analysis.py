@@ -1,27 +1,31 @@
 import re
 from datetime import datetime
+import numpy as np
 from ordered_set import OrderedSet
+import os
 
 # Analyze time- and temperature-dependent pair distribution function data.
 # Details about the experiment are extracted from a log file.
 # Pair distribution function data is stored and read from .gr files.
 
-def read_file(file):
+
+def read_file(file_to_read):
     """
-    Read a file a file line-by-line and extract each line's data.
+    Read a file line-by-line and extract each line's data.
     Args:
         file: File to be parsed/read.
     Returns:
         Each line from the file as items in a list.
     """
-    data_from_file = open(file, mode = 'r')
+    data_from_file = open(file_to_read, mode = 'r')
     individual_lines = data_from_file.readlines()
     return individual_lines
 
 
-def extract_time(current_line): # TEST THIS BY VALIDATING VIA DATETIME (vlaidate(datetime.strptime(substring, "%H:%M:%S")))
+def extract_time(current_line): # TEST THIS BY VALIDATING VIA DATETIME (validate(datetime.strptime(substring, "%H:%M:%S")))
     """
     Identify the time stamp recorded for a specified measurement.
+    Regex syntax: r' ' = raw string, \b = beginning or end of string, \d = digit (0-9).
     Args:
         current_line: Line to search from a previoiusly read file.
     Returns:
@@ -31,7 +35,7 @@ def extract_time(current_line): # TEST THIS BY VALIDATING VIA DATETIME (vlaidate
     return time_in_line.group(0)
 
 
-def extract_temperature(current_split_line):
+def extract_temperature(current_line):
     """
     Identify the temperature at which a specified measurement taken.
     Args:
@@ -39,9 +43,23 @@ def extract_temperature(current_split_line):
     Returns:
         Recorded temperature.
     """
+    current_split_line = current_line.split(' ')
     temperature_readout_index = current_split_line.index("T") + 2
     temperature_in_line = current_split_line[temperature_readout_index]
     return temperature_in_line
+
+
+def time_HMS_to_seconds(time_HMS_format):
+    """
+    Convert time written in standard H:M:S format to seconds.
+    Args:
+        time_HMS_format: Time formatted as "H:M:S".
+    Returns:
+        Time in seconds, equating to corresponding H:M:S format.
+    """
+    datetime_object = datetime.strptime(time_HMS_format, '%H:%M:%S')
+    time_seconds = datetime_object.second + (datetime_object.minute * 60) + (datetime_object.hour * 3600)
+    return time_seconds
 
 
 def round_to_tens_place(unrounded_value):
@@ -63,13 +81,12 @@ def divide_by_100(dividend):
     Returns:
         Dividend, now reduced by a factor of 100.
     """
-    divisor = 100
-    return dividend/divisor
+    return dividend/100
 
 
 def find_repetitive_data(value_to_match, master_list_of_data):
     """
-    Search a list of data to identify which items are identical to a target item.
+    Search a list of data to identify multiple items that are identical to a target item.
     Args:
         value_to_match: Target item to which all list items will be compared.
         master_list_of_data: List of data to search.
@@ -85,7 +102,7 @@ def find_repetitive_data(value_to_match, master_list_of_data):
 
 def pull_indexed_data(indices, master_list_of_data):
     """
-    Store select data from a master list in a new list.
+    Select multiple items from a master list and store in a new list.
     Args:
         indices: List of indexes that guides which data to store.
         master_list_of_data: List to extract data from based on specified indices.
@@ -98,47 +115,30 @@ def pull_indexed_data(indices, master_list_of_data):
     return data_of_interest
 
 
-def time_HMS_to_seconds(list_of_times_HMS_format):
-    """
-    Convert time written in standard H:M:S format to seconds.
-    Args:
-        list_of_times_HMS_format: List of strings formatted as "H:M:S".
-    Returns:
-        List of intgers in seconds, equating to corresponding H:M:S formats.
-    """
-    list_of_times_seconds = []
-    for current_time in list_of_times_HMS_format:
-        datetime_object = datetime.strptime(current_time, '%H:%M:%S')
-        current_time_in_seconds = datetime_object.second + (datetime_object.minute * 60) + (datetime_object.hour * 3600)
-        list_of_times_seconds.append(current_time_in_seconds)
-    return list_of_times_seconds
-
-
-def list_item_differences(list):
+def list_item_differences(original_list):
     """
     Calculate the differences between every item in a list and the first item.
     Args:
-        list: List of values to compute differences within.
+        original_list: List of values to compute differences within.
     Return:
         List of differences, where the first item will always be zero.
     """
-    item_differences = []
-    for item in list: # CONSIDER USING NUMPY, *ARRAY-AT-A-TIME* INSTEAD OF FOR LOOP
-        item_differences.append(item - list[0])
-    return item_differences
+    differences_list = (np.array(original_list) - original_list[0])
+    return differences_list.tolist()
 
 
-def is_not_two_minutes(time_in_seconds):
+def read_file_different_directory(file_directory, file_to_read):
     """
-    Check if a given time is not equal to 2 minutes (120 seconds).
+    Read a file from a different directory line-by-line and extract each line's data.
     Args:
-        Time value, in seconds.
-    Return:
-        False if the inputted time is 120 seconds, True otherwise.
+        file_directory: Name of or path to directory under current working directory.
+        file: File to be parsed/read.
+    Returns:
+        Each line from the file as items in a list.
     """
-    if time_in_seconds == 120:
-        return False
-    return True
+    with open((os.path.join(file_directory, file_to_read)), "r") as open_file:
+        data_from_file = open_file.read()
+    return data_from_file
 
 
 experimental_data = read_file("log.txt")
@@ -148,21 +148,17 @@ recorded_temperatures_from_experiment = []
 for line in experimental_data:
     if re.search(r"Synthetic_CSH_pdf.", line) != None:
         recorded_times_from_experiment.append(extract_time(line))
-        split_line = line.split(' ')
-        recorded_temperatures_from_experiment.append(float(extract_temperature(split_line)))
+        recorded_temperatures_from_experiment.append(float(extract_temperature(line)))
 
+recorded_times_from_experiment = list(map(time_HMS_to_seconds, recorded_times_from_experiment))
 rounded_temperatures = list(map(round_to_tens_place, recorded_temperatures_from_experiment))
-rounded_temperature_quotients = list(map(divide_by_100, rounded_temperatures))
 
 search_index = 0
 measurement_times_at_temp_multiple_of_100 = []
-while search_index < len(rounded_temperature_quotients):
-    floating_point = rounded_temperature_quotients[search_index]
-    if floating_point.is_integer() == True:
-        repeated_data_indices = find_repetitive_data(floating_point, rounded_temperature_quotients)
-        repeated_data_times_HMS = pull_indexed_data(repeated_data_indices, recorded_times_from_experiment)
-        repeated_data_times_seconds = time_HMS_to_seconds(repeated_data_times_HMS) # MAP HERE INSTEAD OF USING LIST FORMAT???
-        measurement_times_at_temp_multiple_of_100.append(repeated_data_times_seconds)
+while search_index < len(rounded_temperatures):
+    if divide_by_100(rounded_temperatures[search_index]).is_integer() == True:
+        repeated_data_indices = find_repetitive_data(rounded_temperatures[search_index], rounded_temperatures)
+        measurement_times_at_temp_multiple_of_100.append(pull_indexed_data(repeated_data_indices, recorded_times_from_experiment))
         search_index = repeated_data_indices.pop() + 1
     else:
         search_index += 1
@@ -170,42 +166,38 @@ while search_index < len(rounded_temperature_quotients):
 measurements_to_skip = []
 for dwell_temperature in measurement_times_at_temp_multiple_of_100:
     time_differences_at_dwell_temperature = list_item_differences(dwell_temperature)
-    index_of_measurement_to_skip = [time_differences_at_dwell_temperature.index(120)]
-    measurements_to_skip.append(pull_indexed_data(index_of_measurement_to_skip, dwell_temperature)[0])
+    measurements_to_skip.append(dwell_temperature[time_differences_at_dwell_temperature.index(120)])
 
 measurements_to_analyze_recorded_times = []
 measurements_to_analyze_recorded_temperatures = []
-for check_time_HMS in recorded_times_from_experiment: # MAP HERE INSTEAD OF FOR LOOP???
-    check_time_seconds = time_HMS_to_seconds([check_time_HMS]) # MAP HERE INSTEAD OF FOR LOOP???
-    if check_time_seconds[0] not in measurements_to_skip:
-        measurements_to_analyze_recorded_times.append(check_time_seconds[0])
-        include_in_analysis_index = [recorded_times_from_experiment.index(check_time_HMS)]
-        measurements_to_analyze_recorded_temperatures.append(pull_indexed_data(include_in_analysis_index, recorded_temperatures_from_experiment)[0])
+for check_time in recorded_times_from_experiment:
+    if check_time not in measurements_to_skip:
+        measurements_to_analyze_recorded_times.append(check_time)
+        measurements_to_analyze_recorded_temperatures.append(recorded_temperatures_from_experiment[recorded_times_from_experiment.index(check_time)])
 
-print(measurements_to_analyze_recorded_times) # SANITY-CHECKING, REMOVE THESE LATER - ADD AS TEST???
-print(measurements_to_analyze_recorded_temperatures)
-print(len(measurements_to_analyze_recorded_times))
-print(len(measurements_to_analyze_recorded_temperatures))
+#print(measurements_to_analyze_recorded_times) # SANITY-CHECKING, REMOVE THESE LATER - ADD AS TEST???
+#print(measurements_to_analyze_recorded_temperatures)
+#print(len(measurements_to_analyze_recorded_times))
+#print(len(measurements_to_analyze_recorded_temperatures))
 
-initial_PDF_data = read_file("Synthetic_CSH_0{:n}degC_normalized.gr".format(rounded_temperatures[0]))
+PDF_initial_data = read_file_different_directory("gr_files", "Synthetic_CSH_0{:n}degC_normalized.gr".format(rounded_temperatures[0]))
 
 two_minute_interval_count = 0
 next_dwell_temperature = 100
 for temperature in OrderedSet(rounded_temperatures):
-    if divide_by_100(temperature).is_integer() == False and two_minute_interval_count < 10:
-        PDF_ramp_data = read_file("Synthetic_CSH_CSH_pdf_ramp_{:n}_0{:n}_normalized.gr".format(next_dwell_temperature, two_minute_interval_count))
+    if temperature == rounded_temperatures[0]:
+        pass
+    elif divide_by_100(temperature).is_integer() == False:
+        PDF_ramp_data = read_file_different_directory("gr_files", "Synthetic_CSH_CSH_pdf_ramp_{:n}_0{:n}_normalized.gr".format(next_dwell_temperature, two_minute_interval_count))
         two_minute_interval_count += 1
-    elif divide_by_100(temperature).is_integer() == True and two_minute_interval_count < 10:
-        PDF_ramp_data = read_file("Synthetic_CSH_CSH_pdf_ramp_{:n}_0{:n}_normalized.gr".format(next_dwell_temperature, two_minute_interval_count))
-        PDF_dwell_data = read_file("Synthetic_CSH_{:n}degC_normalized.gr".format(next_dwell_temperature))
-        two_minute_interval_count = 0
-        next_dwell_temperature += 100
-    elif divide_by_100(temperature).is_integer() == True and two_minute_interval_count >= 10:
-        PDF_ramp_data = read_file("Synthetic_CSH_CSH_pdf_ramp_{:n}_{:n}_normalized.gr".format(next_dwell_temperature, two_minute_interval_count))
-        PDF_dwell_data = read_file("Synthetic_CSH_{:n}degC_normalized.gr".format(next_dwell_temperature))
+    elif divide_by_100(temperature).is_integer() == True and next_dwell_temperature == rounded_temperatures[-1]:
+        PDF_ramp_data = read_file_different_directory("gr_files", "Synthetic_CSH_CSH_pdf_ramp_{:n}_0{:n}_normalized.gr".format(next_dwell_temperature, two_minute_interval_count))
+    else:
+        PDF_ramp_data = read_file_different_directory("gr_files", "Synthetic_CSH_CSH_pdf_ramp_{:n}_0{:n}_normalized.gr".format(next_dwell_temperature, two_minute_interval_count))
+        PDF_dwell_data = read_file_different_directory("gr_files", "Synthetic_CSH_{:n}degC_normalized.gr".format(next_dwell_temperature))
         two_minute_interval_count = 0
         next_dwell_temperature += 100
 
 
 
-# READ AND ANALYZE EACH DATASET
+# ANALYZE EACH DATASET
