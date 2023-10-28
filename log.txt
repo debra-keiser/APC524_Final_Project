@@ -134,9 +134,3 @@
 #U Saved: Synthetic_CSH_pdf_ramp_900_1000 9 at Sun Jul 21 14:44:13 2019, T = 990.47 C, i00= 3.94529e+07
 #U Saved: Synthetic_CSH_pdf_ramp_900_1000 10 at Sun Jul 21 14:46:13 2019, T = 997.35 C, i00= 3.9587e+07
 #U Saved: Synthetic_CSH_pdf_ramp_900_1000 11 at Sun Jul 21 14:48:13 2019, T = 1000.41 C, i00= 3.95046e+07
-
-
-
-
-
-
