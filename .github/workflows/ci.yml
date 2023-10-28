@@ -1,0 +1,44 @@
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Python version
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Pre-commit
+        uses: pre-commit/action@v3.0.0
+        with:
+          extra_args: --all-files
+
+  tests:
+    runs-on: ${{ matrix.runs-on }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runs-on: [ubuntu-latest]
+        python-version: ["3.8", "3.10", "3.12"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Python version
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install package
+        run: python -m pip install .[test]
+
+      - name: Test package
+        run: pipx run nox -s tests
