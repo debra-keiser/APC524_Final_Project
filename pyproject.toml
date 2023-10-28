@@ -20,6 +20,11 @@ test = [
 minversion = "6.0"
 testpaths = ["tests"]
 
+[tool.black]
+extend-exclude = [
+  .*.txt|.*.md|.*.gr|.*.cfg
+]
+
 [tool.ruff]
 select = [
   "E", "F", "W", # default checks
