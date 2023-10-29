@@ -196,7 +196,7 @@ for check_time in recorded_times_from_experiment:
             ]
         )
 
-# print(measurements_to_analyze_recorded_times) # ADD AS TEST???
+# print(measurements_to_analyze_recorded_times) # SANITY-CHECKING, REMOVE THESE LATER - ADD AS TEST???
 # print(measurements_to_analyze_recorded_temperatures)
 # print(len(measurements_to_analyze_recorded_times))
 # print(len(measurements_to_analyze_recorded_temperatures))
@@ -243,4 +243,4 @@ for temperature in OrderedSet(rounded_temperatures):
         next_dwell_temperature += 100
 
 
-# ANALYZE EACH DATASET
+# ANALYZE EACH DATASET VIA FUNCTIONS

@@ -11,14 +11,14 @@ authors = [
 ]
 requires-python = ">=3.8"
 
-[project.optional-dependencies]
-test = [
-    "pytest"
-]
+#[project.optional-dependencies]
+#test = [
+#    "pytest"
+#]
 
-[tool.pytest.ini_options]
-minversion = "6.0"
-testpaths = ["tests"]
+#[tool.pytest.ini_options]
+#minversion = "6.0"
+#testpaths = ["tests"]
 
 [tool.black]
 extend-exclude = '''
@@ -41,6 +41,7 @@ select = [
   "UP", # PyUpgrade
   "ARG", # flake8 unused arguments
   "C4", # flake8-comprehensions
+  "ICN", # flake8-import-conventions
 ]
 extend-ignore = [
   "E501",   # long line
