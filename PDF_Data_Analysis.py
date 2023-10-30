@@ -10,25 +10,31 @@ from ordered_set import OrderedSet
 # Pair distribution function data is stored and read from .gr files.
 
 
-def read_file(file_to_read):
+def extract_time_temp_data(file_to_read):
     """
-    Read a file line-by-line and extract each line's data.
+    Read a file line-by-line and extract data from each line.
     Args:
-        file: File to be parsed/read.
+        file_to_read: File to be parsed/read.
     Returns:
-        Each line from the file as items in a list.
+        Lists that contain data of interest.
     """
     data_from_file = open(file_to_read)
     individual_lines = data_from_file.readlines()
-    return individual_lines
+    data_from_file.close()
+    time_data = []
+    temp_data = []
+    for line in individual_lines:
+        if re.search(r"Synthetic_CSH_pdf.", line) is not None:
+            time_data.append(extract_time(line))
+            temp_data.append(float(extract_temperature(line)))
+    return time_data, temp_data
 
 
-def extract_time(
-    current_line,
-):  # TEST THIS BY VALIDATING VIA DATETIME (validate(datetime.strptime(substring, "%H:%M:%S")))
+def extract_time(current_line):
     """
     Identify the time stamp recorded for a specified measurement.
-    Regex syntax: r' ' = raw string, \b = beginning or end of string, \\d = digit (0-9).
+    re.search looks for the substring "##:##:##".
+    Regex syntax: r" " = raw string, \b = beginning or end of string, \\d = digit (0-9).
     Args:
         current_line: Line to search from a previoiusly read file.
     Returns:
@@ -91,35 +97,25 @@ def divide_by_100(dividend):
     return dividend / 100
 
 
-def find_repetitive_data(value_to_match, master_list_of_data):
+def times_of_target_occurence(value_to_match, list_of_values, list_of_times):
     """
-    Search a list of data to identify multiple items that are identical to a target item.
+    Search a list of data to identify items that are identical to a target item.
+    Subsequently find the recorded time at which this value was encountered during the experiment.
     Args:
         value_to_match: Target item to which all list items will be compared.
-        master_list_of_data: List of data to search.
+        list_of_values: List of data to search for a match to the target.
+        list_of_times: List of timestamps that is complementary to and the same length as list_of_values.
     Returns:
-        Indexes of the items in the searched list that are the same as the target.
+        Times at which the items in the searched list are the same as the target.
     """
-    instances_of_repetition = []
-    for index in range(len(master_list_of_data)):
-        if master_list_of_data[index] == value_to_match:
-            instances_of_repetition.append(index)
-    return instances_of_repetition
-
-
-def pull_indexed_data(indices, master_list_of_data):
-    """
-    Select multiple items from a master list and store in a new list.
-    Args:
-        indices: List of indexes that guides which data to store.
-        master_list_of_data: List to extract data from based on specified indices.
-    Returns:
-        List that contains a specific subset of data from the master list.
-    """
-    data_of_interest = []
-    for index in indices:
-        data_of_interest.append(master_list_of_data[index])
-    return data_of_interest
+    instances_of_target_value = []
+    for index in range(len(list_of_values)):
+        if list_of_values[index] == value_to_match:
+            instances_of_target_value.append(index)
+    corresponding_times = []
+    for index in instances_of_target_value:
+        corresponding_times.append(list_of_times[index])
+    return instances_of_target_value.pop() + 1, corresponding_times
 
 
 def list_item_differences(original_list):
@@ -134,28 +130,36 @@ def list_item_differences(original_list):
     return differences_list.tolist()
 
 
-def read_file_different_directory(file_directory, file_to_read):
-    """
-    Read a file from a different directory line-by-line and extract each line's data.
+def extract_PDF_data(file_directory, gr_file_to_read):
+    r"""
+    Read a .gr file and extract r and Gr data from each line.
+    re.search looks for the line "#### start data".
+    Regex syntax: r" " = raw string, . = any character, \s = white space, \w = alphanumeric.
     Args:
-        file_directory: Name of or path to directory under current working directory.
-        file: File to be parsed/read.
+        file_directory: Name of or path to directory containing the .gr file.
+        file: .gr file to be parsed/read.
     Returns:
-        Each line from the file as items in a list.
+        r and G(r) data as numpy arrays.
     """
-    with open(os.path.join(file_directory, file_to_read)) as open_file:
-        data_from_file = open_file.read()
-    return data_from_file
+    data_from_gr_file = open(os.path.join(file_directory, gr_file_to_read))
+    individual_lines = data_from_gr_file.readlines()
+    for line in individual_lines:
+        if re.search(r"....\s\w\w\w\w\w\s\w\w\w\w", line) is not None:
+            start_data = individual_lines.index(line)
+    r = []
+    Gr = []
+    for r_Gr_pair in range(start_data + 3, len(individual_lines)):
+        split_r_Gr_pair = individual_lines[r_Gr_pair].split()
+        r.append(float(split_r_Gr_pair[0]))
+        Gr.append(float(split_r_Gr_pair[1]))
+    data_from_gr_file.close()
+    return np.array(r, dtype="float64"), np.array(Gr, dtype="float64")
 
 
-experimental_data = read_file("log.txt")
-
-recorded_times_from_experiment = []
-recorded_temperatures_from_experiment = []
-for line in experimental_data:
-    if re.search(r"Synthetic_CSH_pdf.", line) is not None:
-        recorded_times_from_experiment.append(extract_time(line))
-        recorded_temperatures_from_experiment.append(float(extract_temperature(line)))
+(
+    recorded_times_from_experiment,
+    recorded_temperatures_from_experiment,
+) = extract_time_temp_data("log.txt")
 
 recorded_times_from_experiment = list(
     map(time_HMS_to_seconds, recorded_times_from_experiment)
@@ -168,13 +172,12 @@ search_index = 0
 measurement_times_at_temp_multiple_of_100 = []
 while search_index < len(rounded_temperatures):
     if divide_by_100(rounded_temperatures[search_index]).is_integer() is True:
-        repeated_data_indices = find_repetitive_data(
-            rounded_temperatures[search_index], rounded_temperatures
+        search_index, occurrence_times = times_of_target_occurence(
+            rounded_temperatures[search_index],
+            rounded_temperatures,
+            recorded_times_from_experiment,
         )
-        measurement_times_at_temp_multiple_of_100.append(
-            pull_indexed_data(repeated_data_indices, recorded_times_from_experiment)
-        )
-        search_index = repeated_data_indices.pop() + 1
+        measurement_times_at_temp_multiple_of_100.append(occurrence_times)
     else:
         search_index += 1
 
@@ -196,12 +199,7 @@ for check_time in recorded_times_from_experiment:
             ]
         )
 
-# print(measurements_to_analyze_recorded_times) # SANITY-CHECKING, REMOVE THESE LATER - ADD AS TEST???
-# print(measurements_to_analyze_recorded_temperatures)
-# print(len(measurements_to_analyze_recorded_times))
-# print(len(measurements_to_analyze_recorded_temperatures))
-
-PDF_initial_data = read_file_different_directory(
+PDF_initial_data_r, PDF_initial_data_Gr = extract_PDF_data(
     "gr_files", f"Synthetic_CSH_0{rounded_temperatures[0]:n}degC_normalized.gr"
 )
 
@@ -211,7 +209,7 @@ for temperature in OrderedSet(rounded_temperatures):
     if temperature == rounded_temperatures[0]:
         pass
     elif divide_by_100(temperature).is_integer() is False:
-        PDF_ramp_data = read_file_different_directory(
+        PDF_ramp_data_r, PDF_ramp_data_Gr = extract_PDF_data(
             "gr_files",
             "Synthetic_CSH_CSH_pdf_ramp_{:n}_0{:n}_normalized.gr".format(
                 next_dwell_temperature, two_minute_interval_count
@@ -222,25 +220,23 @@ for temperature in OrderedSet(rounded_temperatures):
         divide_by_100(temperature).is_integer() is True
         and next_dwell_temperature == rounded_temperatures[-1]
     ):
-        PDF_ramp_data = read_file_different_directory(
+        PDF_ramp_data_r, PDF_ramp_data_Gr = extract_PDF_data(
             "gr_files",
             "Synthetic_CSH_CSH_pdf_ramp_{:n}_0{:n}_normalized.gr".format(
                 next_dwell_temperature, two_minute_interval_count
             ),
         )
     else:
-        PDF_ramp_data = read_file_different_directory(
+        PDF_ramp_data_r, PDF_ramp_data_Gr = extract_PDF_data(
             "gr_files",
             "Synthetic_CSH_CSH_pdf_ramp_{:n}_0{:n}_normalized.gr".format(
                 next_dwell_temperature, two_minute_interval_count
             ),
         )
-        PDF_dwell_data = read_file_different_directory(
-            "gr_files",
-            f"Synthetic_CSH_{next_dwell_temperature:n}degC_normalized.gr",
+        PDF_dwell_data_r, PDF_dwell_data_Gr = extract_PDF_data(
+            "gr_files", f"Synthetic_CSH_{next_dwell_temperature:n}degC_normalized.gr"
         )
         two_minute_interval_count = 0
         next_dwell_temperature += 100
 
-
-# ANALYZE EACH DATASET VIA FUNCTIONS
+# CONTINUE HERE, ANALYZE EACH DATASET VIA FUNCTIONS
