@@ -9,7 +9,7 @@ from ordered_set import OrderedSet
 from scipy.signal import find_peaks
 
 # Analyze time- and temperature-dependent pair distribution function (PDF) data.
-# Details about the experiment are extracted from a log file.
+# Details about the experiment are extracted from a log.txt file.
 # Pair distribution function data is stored and read from .gr files.
 
 
@@ -57,8 +57,7 @@ def extract_temperature(current_line):
     """
     current_split_line = current_line.split(" ")
     temperature_readout_index = current_split_line.index("T") + 2
-    temperature_in_line = current_split_line[temperature_readout_index]
-    return temperature_in_line
+    return current_split_line[temperature_readout_index]
 
 
 def time_HMS_to_seconds(time_HMS_format):
@@ -70,12 +69,11 @@ def time_HMS_to_seconds(time_HMS_format):
         Time in seconds, equating to corresponding H:M:S format.
     """
     datetime_object = datetime.strptime(time_HMS_format, "%H:%M:%S")
-    time_seconds = (
+    return (
         datetime_object.second
         + (datetime_object.minute * 60)
         + (datetime_object.hour * 3600)
     )
-    return time_seconds
 
 
 def round_to_tens_place(unrounded_value):
@@ -133,9 +131,9 @@ def list_item_differences(original_list):
     return differences_list.tolist()
 
 
-def extract_PDF_data(file_directory, gr_file_to_read):
+def extract_pdf_data(file_directory, gr_file_to_read):
     """
-    Read a .gr file and extract r and Gr data from each line.
+    Read a .gr file and extract r and G(r) data from each line.
     Scale the data if the temperature is less than 100 degrees Celcius.
     Args:
         file_directory: Name of or path to directory containing the .gr file.
@@ -148,15 +146,13 @@ def extract_PDF_data(file_directory, gr_file_to_read):
     for line in individual_lines:
         if re.search(r"#### start data", line) is not None:
             start_data = individual_lines.index(line)
-    r = []
-    Gr = []
-    for r_Gr_pair in range(start_data + 3, len(individual_lines)):
-        split_r_Gr_pair = individual_lines[r_Gr_pair].split()
-        r.append(float(split_r_Gr_pair[0]))
-        Gr.append(float(split_r_Gr_pair[1]))
+    r = np.array([])
+    g_r = np.array([])
+    for r_g_r_pair in range(start_data + 3, len(individual_lines)):
+        split_r_g_r_pair = individual_lines[r_g_r_pair].split()
+        r = np.append(r, float(split_r_g_r_pair[0]))
+        g_r = np.append(g_r, float(split_r_g_r_pair[1]))
     data_from_gr_file.close()
-    r = np.array(r, dtype="float64")
-    Gr = np.array(Gr, dtype="float64")
     with contextlib.suppress(StopIteration):
         if (
             int(
@@ -166,41 +162,40 @@ def extract_PDF_data(file_directory, gr_file_to_read):
             )
             == 100
         ):
-            Gr = rescale_Gr(Gr)
-    return r, Gr
+            g_r = rescale_g_r(g_r)
+    return r, g_r
 
 
-def rescale_Gr(extracted_Gr_data):
+def rescale_g_r(extracted_g_r_data):
     """
     Account for the presence of water in samples measured at temperatures under 100 degrees Celcius.
     Multiply G(r) data by a computed constant to rescale it with respect to a local maximum peak intensity.
     Args:
-        extracted_Gr_data = NumPy array containing raw G(r) values.
+        extracted_g_r_data = NumPy array containing raw G(r) values.
     Returns:
         NumPy array of adjusted G(r) values.
     """
-    H2O_scale_factor = 0.278468 / max(extracted_Gr_data[160:170])
-    rescaled_Gr_data = extracted_Gr_data * H2O_scale_factor
-    return rescaled_Gr_data
+    H2O_scale_factor = 0.278468 / max(extracted_g_r_data[160:170])
+    return extracted_g_r_data * H2O_scale_factor
 
 
 def find_and_plot_peaks(
-    r, Gr
+    r, g_r
 ):  # also pass file name, from which to pull information to title plot (example below)
     """
     Locate the peaks (maxima) in G(r) data, and plot selected peaks along with the PDF.
     Args:
         r = extracted r data.
-        Gr = extracted G(r) data, either raw or rescaled.
+        g_r = extracted G(r) data, either raw or rescaled.
     Returns:
         NumPy array of indices at which selected maxima in G(r) are present.
         Saves a plot of PDF data with markers at certain peak positions as a PNG file.
     """
-    peaks, _ = find_peaks(Gr, height=0)
+    peaks, _ = find_peaks(g_r, height=0)
     peaks = np.delete(peaks, np.where((peaks < 81) | (peaks > 3001)))
     plt.figure(figsize=(80, 40))
-    plt.plot(r, Gr, color="b", linestyle="-", linewidth=5)
-    plt.plot(r[peaks], Gr[peaks], linestyle=" ", marker="P", markersize=40)
+    plt.plot(r, g_r, color="b", linestyle="-", linewidth=5)
+    plt.plot(r[peaks], g_r[peaks], linestyle=" ", marker="P", markersize=40)
     plt.title("PDF Data", fontsize=80, fontweight="bold", loc="center")
     plt.xlabel("r (\u00C5)", fontsize=70, loc="center")
     plt.xlim([0, 60])
@@ -256,10 +251,10 @@ for check_time in recorded_times_from_experiment:
             ]
         )
 
-PDF_initial_data_r, PDF_initial_data_Gr = extract_PDF_data(
+pdf_initial_data_r, pdf_initial_data_g_r = extract_pdf_data(
     "gr_files", f"Synthetic_CSH_0{rounded_temperatures[0]:n}degC_normalized.gr"
 )
-PDF_initial_data_Gr = rescale_Gr(PDF_initial_data_Gr)
+pdf_initial_data_g_r = rescale_g_r(pdf_initial_data_g_r)
 
 two_minute_interval_count = 0
 next_dwell_temperature = 100
@@ -267,7 +262,7 @@ for temperature in OrderedSet(rounded_temperatures):
     if temperature == rounded_temperatures[0]:
         pass
     elif divide_by_100(temperature).is_integer() is False:
-        PDF_ramp_data_r, PDF_ramp_data_Gr = extract_PDF_data(
+        pdf_ramp_data_r, pdf_ramp_data_g_r = extract_pdf_data(
             "gr_files",
             "Synthetic_CSH_CSH_pdf_ramp_{:n}_0{:n}_normalized.gr".format(
                 next_dwell_temperature, two_minute_interval_count
@@ -278,23 +273,23 @@ for temperature in OrderedSet(rounded_temperatures):
         divide_by_100(temperature).is_integer() is True
         and next_dwell_temperature == rounded_temperatures[-1]
     ):
-        PDF_ramp_data_r, PDF_ramp_data_Gr = extract_PDF_data(
+        pdf_ramp_data_r, pdf_ramp_data_g_r = extract_pdf_data(
             "gr_files",
             "Synthetic_CSH_CSH_pdf_ramp_{:n}_0{:n}_normalized.gr".format(
                 next_dwell_temperature, two_minute_interval_count
             ),
         )
     else:
-        PDF_ramp_data_r, PDF_ramp_data_Gr = extract_PDF_data(
+        pdf_ramp_data_r, pdf_ramp_data_g_r = extract_pdf_data(
             "gr_files",
             "Synthetic_CSH_CSH_pdf_ramp_{:n}_0{:n}_normalized.gr".format(
                 next_dwell_temperature, two_minute_interval_count
             ),
         )
-        PDF_dwell_data_r, PDF_dwell_data_Gr = extract_PDF_data(
+        pdf_dwell_data_r, pdf_dwell_data_g_r = extract_pdf_data(
             "gr_files", f"Synthetic_CSH_{next_dwell_temperature:n}degC_normalized.gr"
         )
         two_minute_interval_count = 0
         next_dwell_temperature += 100
 
-peak_indices = find_and_plot_peaks(PDF_ramp_data_r, PDF_ramp_data_Gr)
+peak_indices = find_and_plot_peaks(pdf_ramp_data_r, pdf_ramp_data_g_r)
