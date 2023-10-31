@@ -1,11 +1,14 @@
+import contextlib
 import os
 import re
 from datetime import datetime
 
+import matplotlib.pyplot as plt
 import numpy as np
 from ordered_set import OrderedSet
+from scipy.signal import find_peaks
 
-# Analyze time- and temperature-dependent pair distribution function data.
+# Analyze time- and temperature-dependent pair distribution function (PDF) data.
 # Details about the experiment are extracted from a log file.
 # Pair distribution function data is stored and read from .gr files.
 
@@ -34,7 +37,7 @@ def extract_time(current_line):
     """
     Identify the time stamp recorded for a specified measurement.
     re.search looks for the substring "##:##:##".
-    Regex syntax: r" " = raw string, \b = beginning or end of string, \\d = digit (0-9).
+    RegEx syntax: r" " = raw string, \b = beginning or end of string, \\d = digit (0-9).
     Args:
         current_line: Line to search from a previoiusly read file.
     Returns:
@@ -131,20 +134,19 @@ def list_item_differences(original_list):
 
 
 def extract_PDF_data(file_directory, gr_file_to_read):
-    r"""
+    """
     Read a .gr file and extract r and Gr data from each line.
-    re.search looks for the line "#### start data".
-    Regex syntax: r" " = raw string, . = any character, \s = white space, \w = alphanumeric.
+    Scale the data if the temperature is less than 100 degrees Celcius.
     Args:
         file_directory: Name of or path to directory containing the .gr file.
         file: .gr file to be parsed/read.
     Returns:
-        r and G(r) data as numpy arrays.
+        r and G(r) data as NumPy arrays.
     """
     data_from_gr_file = open(os.path.join(file_directory, gr_file_to_read))
     individual_lines = data_from_gr_file.readlines()
     for line in individual_lines:
-        if re.search(r"....\s\w\w\w\w\w\s\w\w\w\w", line) is not None:
+        if re.search(r"#### start data", line) is not None:
             start_data = individual_lines.index(line)
     r = []
     Gr = []
@@ -153,7 +155,62 @@ def extract_PDF_data(file_directory, gr_file_to_read):
         r.append(float(split_r_Gr_pair[0]))
         Gr.append(float(split_r_Gr_pair[1]))
     data_from_gr_file.close()
-    return np.array(r, dtype="float64"), np.array(Gr, dtype="float64")
+    r = np.array(r, dtype="float64")
+    Gr = np.array(Gr, dtype="float64")
+    with contextlib.suppress(IndexError):
+        if (
+            int(
+                next(
+                    iter(filter(lambda x: x.isdigit(), re.split("_", gr_file_to_read)))
+                )
+            )
+            == 100
+        ):
+            Gr = rescale_Gr(Gr)
+    return r, Gr
+
+
+def rescale_Gr(extracted_Gr_data):
+    """
+    Account for the presence of water in samples measured at temperatures under 100 degrees Celcius.
+    Multiply G(r) data by a computed constant to rescale it with respect to a local maximum peak intensity.
+    Args:
+        extracted_Gr_data = NumPy array containing raw G(r) values.
+    Returns:
+        NumPy array of adjusted G(r) values.
+    """
+    H2O_scale_factor = 0.278468 / max(extracted_Gr_data[160:170])
+    rescaled_Gr_data = extracted_Gr_data * H2O_scale_factor
+    return rescaled_Gr_data
+
+
+def find_and_plot_peaks(
+    r, Gr
+):  # also pass file name, from which to pull information to title plot (example below)
+    """
+    Locate the peaks (maxima) in G(r) data, and plot selected peaks along with the PDF.
+    Args:
+        r = extracted r data.
+        Gr = extracted G(r) data, either raw or rescaled.
+    Returns:
+        NumPy array of indices at which selected maxima in G(r) are present.
+        Saves a plot of PDF data with markers at certain peak positions as a PNG file.
+    """
+    peaks, _ = find_peaks(Gr, height=0)
+    peaks = np.delete(peaks, np.where((peaks < 81) | (peaks > 3001)))
+    plt.figure(figsize=(80, 40))
+    plt.plot(r, Gr, color="b", linestyle="-", linewidth=5)
+    plt.plot(r[peaks], Gr[peaks], linestyle=" ", marker="P", markersize=40)
+    plt.title("PDF Data", fontsize=80, fontweight="bold", loc="center")
+    plt.xlabel("r (\u00C5)", fontsize=70, loc="center")
+    plt.xlim([0, 60])
+    plt.xticks(np.arange(0, 61, 10), fontsize=55)
+    plt.ylabel("G(r)", fontsize=70, loc="center")
+    plt.yticks([], fontsize=55)
+    plt.savefig("PDF_Data")
+    # matplotlib.pyplot.suptitle('Silhouette Analysis of %d Clusters For %d-Component PCA' % (K,n_PCA_components), fontsize = 75,)
+    plt.close()
+    return peaks
 
 
 (
@@ -202,6 +259,7 @@ for check_time in recorded_times_from_experiment:
 PDF_initial_data_r, PDF_initial_data_Gr = extract_PDF_data(
     "gr_files", f"Synthetic_CSH_0{rounded_temperatures[0]:n}degC_normalized.gr"
 )
+PDF_initial_data_Gr = rescale_Gr(PDF_initial_data_Gr)
 
 two_minute_interval_count = 0
 next_dwell_temperature = 100
@@ -239,4 +297,4 @@ for temperature in OrderedSet(rounded_temperatures):
         two_minute_interval_count = 0
         next_dwell_temperature += 100
 
-# CONTINUE HERE, ANALYZE EACH DATASET VIA FUNCTIONS
+peak_indices = find_and_plot_peaks(PDF_ramp_data_r, PDF_ramp_data_Gr)
