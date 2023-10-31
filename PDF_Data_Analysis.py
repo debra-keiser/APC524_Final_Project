@@ -157,7 +157,7 @@ def extract_PDF_data(file_directory, gr_file_to_read):
     data_from_gr_file.close()
     r = np.array(r, dtype="float64")
     Gr = np.array(Gr, dtype="float64")
-    with contextlib.suppress(IndexError):
+    with contextlib.suppress(StopIteration):
         if (
             int(
                 next(
