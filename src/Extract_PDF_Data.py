@@ -11,7 +11,7 @@ from Read_Log_File import extract_time_temp_data
     recorded_times_from_experiment,
     recorded_temperatures_from_experiment,
     rounded_temperatures,
-) = extract_time_temp_data("log.txt")
+) = extract_time_temp_data("../log.txt")
 
 analyte_times, analyte_temperatures = analyte_data(
     recorded_times_from_experiment,
