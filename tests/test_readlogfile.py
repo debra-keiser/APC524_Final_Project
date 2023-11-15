@@ -11,7 +11,7 @@ from src.Read_Log_File import (
 
 def test_time_temp_extraction():
     """Check that the number of extracted experiment times and temperatures are equal."""
-    data_from_file = open("../log.txt")
+    data_from_file = open("log.txt")
     individual_lines = data_from_file.readlines()
     data_from_file.close()
     recorded_times_from_experiment = []
@@ -28,7 +28,7 @@ def test_time_temp_extraction():
 
 def test_time_format():
     """Check that time in the log.txt file is in the expected format."""
-    data_from_file = open("../log.txt")
+    data_from_file = open("log.txt")
     individual_lines = data_from_file.readlines()
     data_from_file.close()
     recorded_times_from_experiment = []
