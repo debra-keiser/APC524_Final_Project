@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "APC524 Fall 2023 Group Project - PDF Data Analysis"
+name = "APC524-Fall-2023-Group-Project_PDF-Data-Analysis"
 authors = [
     {name = "Sophia Bergen", email = "sb5213@princeton.edu"},
     {name = "Debra Keiser", email = "dkeiser@princeton.edu"},
