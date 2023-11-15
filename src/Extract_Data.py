@@ -7,7 +7,7 @@ from Determine_Analytes import divide_by_100
 from ordered_set import OrderedSet
 
 
-def PDF_data_and_peaks(rounded_temperatures):
+def get_PDF_data(rounded_temperatures):
     """
     Extract data from the first .gr file, and continue for each subsequent .gr file of interest.
     Repetitive/Extraneous files are skipped by converting the list in to an ordered set.

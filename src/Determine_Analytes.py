@@ -19,7 +19,7 @@ def analyte_data(
     measurement_times_at_temp_multiple_of_100 = []
     while search_index < len(rounded_temperatures):
         if divide_by_100(rounded_temperatures[search_index]).is_integer() is True:
-            search_index, occurrence_times = times_of_target_occurence(
+            search_index, occurrence_times = times_of_target_occurrence(
                 rounded_temperatures[search_index],
                 rounded_temperatures,
                 recorded_times_from_experiment,
@@ -59,7 +59,7 @@ def divide_by_100(dividend):
     return dividend / 100
 
 
-def times_of_target_occurence(value_to_match, list_of_values, list_of_times):
+def times_of_target_occurrence(value_to_match, list_of_values, list_of_times):
     """
     Search a list of data to identify items that are identical to a target item.
     Subsequently find the recorded time at which this value was encountered during the experiment.
