@@ -4,24 +4,30 @@ import re
 
 import numpy as np
 from ordered_set import OrderedSet
+from scipy.signal import find_peaks
 
 from src.Determine_Analytes import divide_by_100
 
 
-def get_PDF_data(rounded_temperatures):
+def get_pdf_data(rounded_temperatures):
     """
     Extract data from the first .gr file, and continue for each subsequent .gr file of interest.
     Repetitive/Extraneous files are skipped by converting the list in to an ordered set.
+    Find the peaks within a specified range, and store the data for further analysis.
     Args:
         rounded_temperatures: List of rounded temperature values.
     Returns:
-        r and G(r) (raw or scaled) data as NumPy arrays.
-
+        Two separate dictionaries for ramp and dwell data.
+        Keys are identifying temperatures/intervals and values are NumPy arrays of peak positions.
     """
+    pdf_ramp_peaks_dict = {}
+    pdf_dwell_peaks_dict = {}
     pdf_initial_data_r, pdf_initial_data_g_r = extract_pdf_data(
         "../gr_files", f"Synthetic_CSH_0{rounded_temperatures[0]:n}degC_normalized.gr"
     )
-    pdf_initial_data_g_r = rescale_g_r(pdf_initial_data_g_r)
+    pdf_dwell_peaks_dict[f"{rounded_temperatures[0]:n}"] = locate_peaks(
+        pdf_initial_data_g_r
+    )
 
     two_minute_interval_count = 0
     next_dwell_temperature = 100
@@ -35,6 +41,9 @@ def get_PDF_data(rounded_temperatures):
                     next_dwell_temperature, two_minute_interval_count
                 ),
             )
+            pdf_ramp_peaks_dict[
+                f"{next_dwell_temperature:n}_0{two_minute_interval_count:n}"
+            ] = locate_peaks(pdf_ramp_data_g_r)
             two_minute_interval_count += 1
         elif (
             divide_by_100(temperature).is_integer() is True
@@ -46,6 +55,9 @@ def get_PDF_data(rounded_temperatures):
                     next_dwell_temperature, two_minute_interval_count
                 ),
             )
+            pdf_ramp_peaks_dict[
+                f"{next_dwell_temperature:n}_0{two_minute_interval_count:n}"
+            ] = locate_peaks(pdf_ramp_data_g_r)
         else:
             pdf_ramp_data_r, pdf_ramp_data_g_r = extract_pdf_data(
                 "../gr_files",
@@ -57,10 +69,16 @@ def get_PDF_data(rounded_temperatures):
                 "../gr_files",
                 f"Synthetic_CSH_{next_dwell_temperature:n}degC_normalized.gr",
             )
+            pdf_ramp_peaks_dict[
+                f"{next_dwell_temperature:n}_0{two_minute_interval_count:n}"
+            ] = locate_peaks(pdf_ramp_data_g_r)
+            pdf_dwell_peaks_dict[f"{next_dwell_temperature:n}"] = locate_peaks(
+                pdf_dwell_data_g_r
+            )
             two_minute_interval_count = 0
             next_dwell_temperature += 100
 
-    return pdf_ramp_data_r, pdf_ramp_data_g_r
+    return pdf_ramp_peaks_dict, pdf_dwell_peaks_dict
 
 
 def extract_pdf_data(file_directory, gr_file_to_read):
@@ -109,3 +127,16 @@ def rescale_g_r(extracted_g_r_data):
     """
     H2O_scale_factor = 0.278468 / max(extracted_g_r_data[160:170])
     return extracted_g_r_data * H2O_scale_factor
+
+
+def locate_peaks(g_r):
+    """
+    Locate the peaks (maxima) in G(r) data within a specified range.
+    Args:
+        g_r = extracted G(r) data, either raw or rescaled.
+    Returns:
+        NumPy array of indices at which selected maxima in G(r) are present.
+    """
+    peaks, _ = find_peaks(g_r, height=0)
+    peaks = np.delete(peaks, np.where((peaks < 81) | (peaks > 3001)))
+    return peaks

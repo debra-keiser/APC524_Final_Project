@@ -1,6 +1,6 @@
+import numpy as np
 from Determine_Analytes import analyte_data
-from Extract_Data import get_PDF_data
-from Plot_Peaks import find_and_plot_peaks
+from Extract_Data import get_pdf_data
 from Read_Log_File import extract_time_temp_data
 
 # Analyze time- and temperature-dependent pair distribution function (PDF) data.
@@ -19,6 +19,7 @@ analyte_times, analyte_temperatures = analyte_data(
     rounded_temperatures,
 )
 
-pdf_ramp_data_r, pdf_ramp_data_g_r = get_PDF_data(rounded_temperatures)
+pdf_ramp_peaks_dict, pdf_dwell_peaks_dict = get_pdf_data(rounded_temperatures)
 
-peak_indicies = find_and_plot_peaks(pdf_ramp_data_r, pdf_ramp_data_g_r)
+np.savez("pdf_ramp_peaks.npz", **pdf_ramp_peaks_dict)
+np.savez("pdf_dwell_peaks.npz", **pdf_dwell_peaks_dict)
