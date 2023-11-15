@@ -14,7 +14,8 @@ requires-python = ">=3.8"
 
 [project.optional-dependencies]
 test = [
-    "pytest"
+    "pytest",
+    "numpy",
 ]
 
 [tool.pytest.ini_options]
@@ -35,18 +36,21 @@ extend-exclude = '''
 
 [tool.ruff]
 select = [
-  "E", "F", "W", # default checks
-  "B", # bugbear
-  "I", # isort
-  "RUF", # Ruff-specific
-  "UP", # PyUpgrade
-  "ARG", # flake8 unused arguments
-  "C4", # flake8-comprehensions
-  "ICN", # flake8-import-conventions
+    "E", "F", "W", # default checks
+    "B", # bugbear
+    "I", # isort
+    "RUF", # Ruff-specific
+    "UP", # PyUpgrade
+    "ARG", # flake8 unused arguments
+    "C4", # flake8-comprehensions
+    "ICN", # flake8-import-conventions
 ]
 extend-ignore = [
-  "E501",   # long line
+    "E501",   # long line
 ]
 extend-exclude = [
-  ".txt", ".md", ".gr", ".cfg"
+    ".txt",
+    ".md",
+    ".gr",
+    ".cfg",
 ]
