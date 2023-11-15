@@ -8,9 +8,9 @@ from src.Extract_Data import rescale_g_r
 
 def test_r_gr_extraction():
     """Check that the NumPy arrays of all r and g_r data are equal and can therefore be plotted."""
-    for filename in os.listdir("../gr_files"):
+    for filename in os.listdir("gr_files"):
         if filename.endswith(".gr"):
-            data_from_file = open(os.path.join("../gr_files", filename))
+            data_from_file = open(os.path.join("gr_files", filename))
             individual_lines = data_from_file.readlines()
             for line in individual_lines:
                 if re.search(r"#### start data", line) is not None:
@@ -29,7 +29,7 @@ def test_r_gr_extraction():
 def test_rescaling():
     """Check that g_r data is scaled appropriately to the correct peak intensity."""
     data_from_gr_file = open(
-        os.path.join("../gr_files", "Synthetic_CSH_CSH_pdf_ramp_100_04_normalized.gr")
+        os.path.join("gr_files", "Synthetic_CSH_CSH_pdf_ramp_100_04_normalized.gr")
     )
     individual_lines = data_from_gr_file.readlines()
     for line in individual_lines:
