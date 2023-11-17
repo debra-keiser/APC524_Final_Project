@@ -1,6 +1,7 @@
 import numpy as np
 from Determine_Analytes import analyte_data
 from Extract_Data import get_pdf_data
+from Plot_Total_Peaks import plot_total_peaks
 from Read_Log_File import extract_time_temp_data
 
 # Analyze time- and temperature-dependent pair distribution function (PDF) data.
@@ -23,3 +24,5 @@ pdf_ramp_peaks_dict, pdf_dwell_peaks_dict = get_pdf_data(rounded_temperatures)
 
 np.savez("pdf_ramp_peaks.npz", **pdf_ramp_peaks_dict)
 np.savez("pdf_dwell_peaks.npz", **pdf_dwell_peaks_dict)
+
+plot_total_peaks("pdf_ramp_peaks.npz")
