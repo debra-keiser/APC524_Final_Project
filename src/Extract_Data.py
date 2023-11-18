@@ -80,7 +80,6 @@ def get_pdf_data(rounded_temperatures):
 
     return pdf_ramp_peaks_dict, pdf_dwell_peaks_dict
 
-
 def extract_pdf_data(file_directory, gr_file_to_read):
     """
     Read a .gr file and extract r and G(r) data from each line.
@@ -91,31 +90,30 @@ def extract_pdf_data(file_directory, gr_file_to_read):
     Returns:
         r and G(r) (raw or scaled) data as NumPy arrays.
     """
-    data_from_gr_file = open(os.path.join(file_directory, gr_file_to_read))
-    individual_lines = data_from_gr_file.readlines()
-    for line in individual_lines:
-        if re.search(r"#### start data", line) is not None:
-            start_data = individual_lines.index(line)
-    r = np.array([])
-    g_r = np.array([])
-    for r_g_r_pair in range(start_data + 3, len(individual_lines)):
-        split_r_g_r_pair = individual_lines[r_g_r_pair].split()
-        r = np.append(r, float(split_r_g_r_pair[0]))
-        g_r = np.append(g_r, float(split_r_g_r_pair[1]))
-    data_from_gr_file.close()
-    with contextlib.suppress(StopIteration):
-        if (
-            int(
-                next(
-                    iter(filter(lambda x: x.isdigit(), re.split("_", gr_file_to_read)))
-                )
-            )
-            == 100
-        ):
-            g_r = rescale_g_r(g_r)
+
+    # construct file path
+    file_path = os.path.join(file_directory, gr_file_to_read)
+
+    # open the .gr file and read lines as a list 
+    with open(file_path, 'r') as file:
+        individual_lines = file.readlines()
+
+    # Find the line containing "#### start data"
+    start_data = next((i for i, line in enumerate(individual_lines) if re.search(r"#### start data", line)), None)
+
+    # Extract g and G(r) data from the lines starting from after start data       
+    if start_data is not None:
+        data = [line.split() for line in individual_lines[start_data + 3:]]
+        data = np.array(data, dtype=float).T
+
+        r, g_r = data[0], data[1]
+        
+    # check file name to see if resaling is needed, and us rescale_g_r if needed
+    if '100_' in gr_file_to_read:
+        g_r = rescale_g_r(g_r)
+        
     return r, g_r
-
-
+    
 def rescale_g_r(extracted_g_r_data):
     """
     Account for the presence of water in samples measured at temperatures under 100 degrees Celcius.
