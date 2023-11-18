@@ -132,6 +132,7 @@ def rescale_g_r(extracted_g_r_data):
 def locate_peaks(g_r):
     """
     Locate the peaks (maxima) in G(r) data within a specified range.
+    #Maybe an extra sentence here to inform where function find_peaks is defined? Is this a built-in function?
     Args:
         g_r = extracted G(r) data, either raw or rescaled.
     Returns:
