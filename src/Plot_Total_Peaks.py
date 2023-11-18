@@ -1,3 +1,7 @@
+"""
+Sophia, you need to put some explanations here!
+"""
+
 import matplotlib.pyplot as plt
 import numpy as np
 
