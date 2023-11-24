@@ -1,8 +1,9 @@
+import os
 import re
 from datetime import datetime
 
 
-def extract_time_temp_data(file_to_read):
+def extract_time_temp_data(file_directory, file_to_read):
     """
     Read a file line-by-line and extract data from each line.
     Args:
@@ -10,9 +11,9 @@ def extract_time_temp_data(file_to_read):
     Returns:
         Lists that contain times and temperatures at which PDF data was recorded.
     """
-    data_from_file = open(file_to_read)
-    individual_lines = data_from_file.readlines()
-    data_from_file.close()
+    with open(os.path.join(file_directory, file_to_read)) as open_file:
+        individual_lines = open_file.readlines()
+
     recorded_times_from_experiment = []
     recorded_temperatures_from_experiment = []
     for line in individual_lines:
@@ -21,12 +22,14 @@ def extract_time_temp_data(file_to_read):
             recorded_temperatures_from_experiment.append(
                 float(extract_temperature(line))
             )
+
     recorded_times_from_experiment = list(
         map(time_HMS_to_seconds, recorded_times_from_experiment)
     )
     rounded_temperatures = list(
         map(round_to_tens_place, recorded_temperatures_from_experiment)
     )
+
     return (
         recorded_times_from_experiment,
         recorded_temperatures_from_experiment,
@@ -45,6 +48,7 @@ def extract_time(current_line):
         Recorded time in standard H:M:S format.
     """
     time_in_line = re.search(r"\b\d\d:\d\d:\d\d\b", current_line)
+
     return time_in_line.group(0)
 
 
@@ -58,6 +62,7 @@ def extract_temperature(current_line):
     """
     current_split_line = current_line.split(" ")
     temperature_readout_index = current_split_line.index("T") + 2
+
     return current_split_line[temperature_readout_index]
 
 
@@ -70,6 +75,7 @@ def time_HMS_to_seconds(time_HMS_format):
         Time in seconds, equating to corresponding H:M:S format.
     """
     datetime_object = datetime.strptime(time_HMS_format, "%H:%M:%S")
+
     return (
         datetime_object.second
         + (datetime_object.minute * 60)
@@ -85,4 +91,5 @@ def round_to_tens_place(unrounded_value):
     Returns:
         Unrounded value, now rounded as shown above.
     """
+
     return round(unrounded_value, -1)

@@ -1,4 +1,3 @@
-import contextlib
 import os
 import re
 
@@ -23,7 +22,8 @@ def get_pdf_data(rounded_temperatures):
     pdf_ramp_peaks_dict = {}
     pdf_dwell_peaks_dict = {}
     pdf_initial_data_r, pdf_initial_data_g_r = extract_pdf_data(
-        "../gr_files", f"Synthetic_CSH_0{rounded_temperatures[0]:n}degC_normalized.gr"
+        "../data/gr_files",
+        f"Synthetic_CSH_0{rounded_temperatures[0]:n}degC_normalized.gr",
     )
     pdf_dwell_peaks_dict[f"{rounded_temperatures[0]:n}"] = locate_peaks(
         pdf_initial_data_g_r
@@ -36,7 +36,7 @@ def get_pdf_data(rounded_temperatures):
             pass
         elif divide_by_100(temperature).is_integer() is False:
             pdf_ramp_data_r, pdf_ramp_data_g_r = extract_pdf_data(
-                "../gr_files",
+                "../data/gr_files",
                 "Synthetic_CSH_CSH_pdf_ramp_{:n}_0{:n}_normalized.gr".format(
                     next_dwell_temperature, two_minute_interval_count
                 ),
@@ -50,7 +50,7 @@ def get_pdf_data(rounded_temperatures):
             and next_dwell_temperature == rounded_temperatures[-1]
         ):
             pdf_ramp_data_r, pdf_ramp_data_g_r = extract_pdf_data(
-                "../gr_files",
+                "../data/gr_files",
                 "Synthetic_CSH_CSH_pdf_ramp_{:n}_0{:n}_normalized.gr".format(
                     next_dwell_temperature, two_minute_interval_count
                 ),
@@ -60,13 +60,13 @@ def get_pdf_data(rounded_temperatures):
             ] = locate_peaks(pdf_ramp_data_g_r)
         else:
             pdf_ramp_data_r, pdf_ramp_data_g_r = extract_pdf_data(
-                "../gr_files",
+                "../data/gr_files",
                 "Synthetic_CSH_CSH_pdf_ramp_{:n}_0{:n}_normalized.gr".format(
                     next_dwell_temperature, two_minute_interval_count
                 ),
             )
             pdf_dwell_data_r, pdf_dwell_data_g_r = extract_pdf_data(
-                "../gr_files",
+                "../data/gr_files",
                 f"Synthetic_CSH_{next_dwell_temperature:n}degC_normalized.gr",
             )
             pdf_ramp_peaks_dict[
@@ -91,28 +91,25 @@ def extract_pdf_data(file_directory, gr_file_to_read):
     Returns:
         r and G(r) (raw or scaled) data as NumPy arrays.
     """
-    data_from_gr_file = open(os.path.join(file_directory, gr_file_to_read))
-    individual_lines = data_from_gr_file.readlines()
-    for line in individual_lines:
-        if re.search(r"#### start data", line) is not None:
-            start_data = individual_lines.index(line)
-    r = np.array([])
-    g_r = np.array([])
-    for r_g_r_pair in range(start_data + 3, len(individual_lines)):
-        split_r_g_r_pair = individual_lines[r_g_r_pair].split()
-        r = np.append(r, float(split_r_g_r_pair[0]))
-        g_r = np.append(g_r, float(split_r_g_r_pair[1]))
-    data_from_gr_file.close()
-    with contextlib.suppress(StopIteration):
-        if (
-            int(
-                next(
-                    iter(filter(lambda x: x.isdigit(), re.split("_", gr_file_to_read)))
-                )
-            )
-            == 100
-        ):
-            g_r = rescale_g_r(g_r)
+    with open(os.path.join(file_directory, gr_file_to_read)) as open_gr_file:
+        individual_lines = open_gr_file.readlines()
+
+    start_data = next(
+        (
+            i
+            for i, line in enumerate(individual_lines)
+            if re.search(r"#### start data", line)
+        ),
+        None,
+    )
+    if start_data is not None:
+        data = [line.split() for line in individual_lines[start_data + 3 :]]
+        data = np.array(data, dtype=float).T
+        r, g_r = data[0], data[1]
+
+    if "100_" in gr_file_to_read:
+        g_r = rescale_g_r(g_r)
+
     return r, g_r
 
 
@@ -126,12 +123,13 @@ def rescale_g_r(extracted_g_r_data):
         NumPy array of adjusted G(r) values.
     """
     H2O_scale_factor = 0.278468 / max(extracted_g_r_data[160:170])
+
     return extracted_g_r_data * H2O_scale_factor
 
 
 def locate_peaks(g_r):
     """
-    Locate the peaks (maxima) in G(r) data within a specified range.
+    Locate the peaks (maxima) in G(r) data within a specified range using the scipy.signal.find_peaks function.
     Args:
         g_r = extracted G(r) data, either raw or rescaled.
     Returns:
@@ -139,4 +137,5 @@ def locate_peaks(g_r):
     """
     peaks, _ = find_peaks(g_r, height=0)
     peaks = np.delete(peaks, np.where((peaks < 81) | (peaks > 3001)))
+
     return peaks

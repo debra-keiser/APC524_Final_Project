@@ -45,6 +45,7 @@ def analyte_data(
                     recorded_times_from_experiment.index(check_time)
                 ]
             )
+
     return analyte_times, analyte_temperatures
 
 
@@ -56,6 +57,7 @@ def divide_by_100(dividend):
     Returns:
         Dividend, now reduced by a factor of 100.
     """
+
     return dividend / 100
 
 
@@ -75,8 +77,10 @@ def times_of_target_occurrence(value_to_match, list_of_values, list_of_times):
         if list_of_values[index] == value_to_match:
             instances_of_target_value.append(index)
     corresponding_times = []
+
     for index in instances_of_target_value:
         corresponding_times.append(list_of_times[index])
+
     return instances_of_target_value.pop() + 1, corresponding_times
 
 
@@ -89,4 +93,5 @@ def list_item_differences(original_list):
         List of differences, where the first item will always be zero.
     """
     differences_list = np.array(original_list) - original_list[0]
+
     return differences_list.tolist()
