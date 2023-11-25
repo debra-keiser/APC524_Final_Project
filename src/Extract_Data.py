@@ -2,10 +2,9 @@ import os
 import re
 
 import numpy as np
+from Determine_Analytes import divide_by_100
 from ordered_set import OrderedSet
 from scipy.signal import find_peaks
-
-from src.Determine_Analytes import divide_by_100
 
 
 def get_pdf_data(rounded_temperatures):
