@@ -3,6 +3,7 @@ import os
 import numpy as np
 from Determine_Analytes import analyte_data
 from Extract_Data import get_pdf_data
+from Integrate_Peaks import peak_integration
 from Plot_Total_Peaks import plot_total_peaks
 from Read_Log_File import extract_time_temp_data
 
@@ -28,3 +29,4 @@ np.savez(os.path.join("../data", "pdf_ramp_peaks.npz"), **pdf_ramp_peaks_dict)
 np.savez(os.path.join("../data", "pdf_dwell_peaks.npz"), **pdf_dwell_peaks_dict)
 
 plot_total_peaks("../data", "pdf_ramp_peaks.npz")
+peak_integration(pdf_dwell_peaks_dict)

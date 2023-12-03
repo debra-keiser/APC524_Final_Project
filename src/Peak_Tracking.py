@@ -1,12 +1,14 @@
 '''
+"""
 My objective is to generate a new 2D matrix (called "tracked") with shape (a,b) where:
     a: total measurements/gr files
-    b: max number of peaks from all measurements 
+    b: max number of peaks from all measurements
 The matrix consists of the peak positions, and the "same" peaks (across rows) populate the same index (column) in the matrix.
-The value 'NaN' indicates undetected peak in the measurement. 
+The value 'NaN' indicates undetected peak in the measurement.
 
 This version of code has only considered the first two (dwell) files.
-I am still in progress of making the algorithm. 
+I am still in progress of making the algorithm.
+"""
 
 import numpy as np
 
