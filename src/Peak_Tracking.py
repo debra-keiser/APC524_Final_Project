@@ -7,7 +7,7 @@ The value 'NaN' indicates undetected peak in the measurement.
 
 This version of code has only considered the first two (dwell) files.
 I am still in progress of making the algorithm. 
-'''
+
 import numpy as np
 
 file = np.load("../peak_positions_npz/pdf_dwell_peaks.npz")
@@ -37,3 +37,4 @@ while p1 < len(file[keys[0]])-1 or p2 < len(file[keys[1]])-1:
     p2 += 1
 tracked[i+1,p1] = file[keys[i+1]][p2]
 print(tracked)
+'''
