@@ -141,7 +141,7 @@ def locate_peaks(g_r):
         NumPy array of indices at which selected maxima in G(r) are present.
     """
     peaks, _ = find_peaks(g_r, height=0)
-    
+
     # Remove peaks outside of range 0.81 - 30.00 Angstroms
     peaks = np.delete(peaks, np.where((peaks < 81) | (peaks > 3001)))
 

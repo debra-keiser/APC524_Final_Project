@@ -62,7 +62,7 @@ def extract_temperature(current_line):
         Recorded temperature.
     """
     current_split_line = current_line.split(" ")
-    
+
     # Search for where the temperature is located in the line.
     temperature_readout_index = current_split_line.index("T") + 2
 
