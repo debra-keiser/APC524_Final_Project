@@ -10,7 +10,7 @@ from src.Integrate_Peaks import (
 def test_integrate_peak_areas():
     """Check that the correct lower- and upper-bound peak minimums are identified."""
     _, pdf_dwell_data_g_r = extract_pdf_data(
-        "../data/gr_files",
+        "data/gr_files",
         "Synthetic_CSH_100degC_normalized.gr",
     )
 
