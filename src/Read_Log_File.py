@@ -5,11 +5,11 @@ from datetime import datetime
 
 def extract_time_temp_data(file_directory, file_to_read):
     """
-    Read a file line-by-line and extract data from each line.
+    Read a file line-by-line and extract time and temperature identifiers from each line.
     Args:
         file_to_read: File to be parsed/read.
     Returns:
-        Lists that contain times and temperatures at which PDF data was recorded.
+        List of times, list of temperatures, list of rounded temperatures at which PDF data was recorded.
     """
     with open(os.path.join(file_directory, file_to_read)) as open_file:
         individual_lines = open_file.readlines()
@@ -23,6 +23,7 @@ def extract_time_temp_data(file_directory, file_to_read):
                 float(extract_temperature(line))
             )
 
+    # Convert time and temperature data to convenient formats for subsequent use.
     recorded_times_from_experiment = list(
         map(time_HMS_to_seconds, recorded_times_from_experiment)
     )
@@ -61,6 +62,8 @@ def extract_temperature(current_line):
         Recorded temperature.
     """
     current_split_line = current_line.split(" ")
+    
+    # Search for where the temperature is located in the line.
     temperature_readout_index = current_split_line.index("T") + 2
 
     return current_split_line[temperature_readout_index]
@@ -72,7 +75,7 @@ def time_HMS_to_seconds(time_HMS_format):
     Args:
         time_HMS_format: Time formatted as "H:M:S".
     Returns:
-        Time in seconds, equating to corresponding H:M:S format.
+        Time in seconds that is equivalent to corresponding H:M:S format.
     """
     datetime_object = datetime.strptime(time_HMS_format, "%H:%M:%S")
 
@@ -89,7 +92,7 @@ def round_to_tens_place(unrounded_value):
     Args:
         unrounded_value: Value to be rounded.
     Returns:
-        Unrounded value, now rounded as shown above.
+        Unrounded value now rounded as shown above.
     """
 
     return round(unrounded_value, -1)

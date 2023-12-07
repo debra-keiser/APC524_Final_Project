@@ -10,17 +10,18 @@ from src.Determine_Analytes import divide_by_100
 
 def get_pdf_data(rounded_temperatures):
     """
-    Extract data from the first .gr file, and continue for each subsequent .gr file of interest.
+    Extract data from each .gr file of interest.
     Repetitive/Extraneous files are skipped by converting the list in to an ordered set.
-    Find the peaks within a specified range, and store the data for further analysis.
     Args:
         rounded_temperatures: List of rounded temperature values.
     Returns:
-        Two separate dictionaries for ramp and dwell data.
+        Dictionary of ramp data, dictionary of dwell data.
         Keys are identifying temperatures/intervals and values are NumPy arrays of peak positions.
     """
     pdf_ramp_peaks_dict = {}
     pdf_dwell_peaks_dict = {}
+
+    # Extract data for the first PDF.
     pdf_initial_data_r, pdf_initial_data_g_r = extract_pdf_data(
         "../data/gr_files",
         f"Synthetic_CSH_0{rounded_temperatures[0]:n}degC_normalized.gr",
@@ -29,6 +30,7 @@ def get_pdf_data(rounded_temperatures):
         pdf_initial_data_g_r
     )
 
+    # Extract data for every PDF after the first.
     two_minute_interval_count = 0
     next_dwell_temperature = 100
     for temperature in OrderedSet(rounded_temperatures):
@@ -84,16 +86,17 @@ def get_pdf_data(rounded_temperatures):
 def extract_pdf_data(file_directory, gr_file_to_read):
     """
     Read a .gr file and extract r and G(r) data from each line.
-    Scale the data if the temperature is less than 100 degrees Celcius.
+    Rescale the data if the temperature is less than 100 degrees Celcius.
     Args:
         file_directory: Name of or path to directory containing the .gr file.
         file: .gr file to be parsed/read.
     Returns:
-        r and G(r) (raw or scaled) data as NumPy arrays.
+        NumPy array of r data, NumPy array of G(r) data (raw or scaled).
     """
     with open(os.path.join(file_directory, gr_file_to_read)) as open_gr_file:
         individual_lines = open_gr_file.readlines()
 
+    # Search for the line that signals the start of data to be extracted.
     start_data = next(
         (
             i
@@ -116,6 +119,7 @@ def extract_pdf_data(file_directory, gr_file_to_read):
 def rescale_g_r(extracted_g_r_data):
     """
     Account for the presence of water in samples measured at temperatures under 100 degrees Celcius.
+    The dividend used to compute the scale factor is the maximum Si-O peak intensity at 100 degrees Celcius.
     Multiply G(r) data by a computed constant to rescale it with respect to a local maximum peak intensity.
     Args:
         extracted_g_r_data = NumPy array containing raw G(r) values.
@@ -130,12 +134,15 @@ def rescale_g_r(extracted_g_r_data):
 def locate_peaks(g_r):
     """
     Locate the peaks (maxima) in G(r) data within a specified range using the scipy.signal.find_peaks function.
+    Only record peaks with a positive maximum intensity.
     Args:
         g_r = extracted G(r) data, either raw or rescaled.
     Returns:
         NumPy array of indices at which selected maxima in G(r) are present.
     """
     peaks, _ = find_peaks(g_r, height=0)
+    
+    # Remove peaks outside of range 0.81 - 30.00 Angstroms
     peaks = np.delete(peaks, np.where((peaks < 81) | (peaks > 3001)))
 
     return peaks

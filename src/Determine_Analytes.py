@@ -13,10 +13,11 @@ def analyte_data(
         recorded_temperatures_from_experiment: List of temperatures at which PDF data was recorded.
         rounded_temperatures: List of temperatures, each rounded to the nearest 10s place.
     Returns:
-        Two lists, one of analyte times and the other of analyte temperatures.
+        List of analyte times, list of analyte temperatures.
     """
     search_index = 0
     measurement_times_at_temp_multiple_of_100 = []
+    # Search for data recorded during five-minute dwell intervals.
     while search_index < len(rounded_temperatures):
         if divide_by_100(rounded_temperatures[search_index]).is_integer() is True:
             search_index, occurrence_times = times_of_target_occurrence(
@@ -28,6 +29,7 @@ def analyte_data(
         else:
             search_index += 1
 
+    # Skip/Discard extraneous data collected before the five-minute dwell interval concludes.
     measurements_to_skip = []
     for dwell_temperature in measurement_times_at_temp_multiple_of_100:
         time_differences_at_dwell_temperature = list_item_differences(dwell_temperature)
@@ -55,7 +57,7 @@ def divide_by_100(dividend):
     Args:
         dividend: Value to divide by 100.
     Returns:
-        Dividend, now reduced by a factor of 100.
+        Dividend reduced by a factor of 100.
     """
 
     return dividend / 100
@@ -64,13 +66,13 @@ def divide_by_100(dividend):
 def times_of_target_occurrence(value_to_match, list_of_values, list_of_times):
     """
     Search a list of data to identify items that are identical to a target item.
-    Subsequently find the recorded time at which this value was encountered during the experiment.
+    Find the recorded time at which this value was encountered during the experiment.
     Args:
         value_to_match: Target item to which all list items will be compared.
         list_of_values: List of data to search for a match to the target.
         list_of_times: List of timestamps that is complementary to and the same length as list_of_values.
     Returns:
-        Times at which the items in the searched list are the same as the target.
+        Index that advances search_index, list of times at which the items in the searched list are the same as the target.
     """
     instances_of_target_value = []
     for index in range(len(list_of_values)):
@@ -90,7 +92,8 @@ def list_item_differences(original_list):
     Args:
         original_list: List of values to compute differences within.
     Return:
-        List of differences, where the first item will always be zero.
+        List of differences.
+        The first item of the list will always be zero.
     """
     differences_list = np.array(original_list) - original_list[0]
 
