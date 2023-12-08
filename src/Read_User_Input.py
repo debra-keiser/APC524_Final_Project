@@ -6,20 +6,20 @@ Date Modified: 08DEC2023
 
 Description:
 This script reads user_input.txt to feed any functions with PDF files intended to be analyzed.
-Returns 2 separate arrays, one indicating the type of experiment (either 'dwell' or 'ramp') and the other indicating the key.
 """
+
 import numpy as np
 
 
 def read_user_input():
-    user_input = open("user_input.txt")
     experiment_type = np.array([])
     temperature_point = np.array([])
 
-    for line in user_input:
-        fields = line.split(",")
-        experiment_type = np.append(experiment_type, fields[0])
-        temperature_point = np.append(temperature_point, fields[1][:-1])
+    with open("user_input.txt") as file:
+        for line in file.readlines()[:-1]:
+            fields = line.strip().split(",")
+            experiment_type = np.append(experiment_type, fields[0])
+            temperature_point = np.append(temperature_point, fields[1])
 
-    user_input.close()
+    file.close()
     return experiment_type, temperature_point

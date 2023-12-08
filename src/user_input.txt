@@ -1,4 +1,4 @@
 dwell,300
 dwell,400
 ramp,500_01
-end
+finish
