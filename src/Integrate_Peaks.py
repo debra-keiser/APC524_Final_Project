@@ -1,3 +1,4 @@
+import itertools
 import os
 
 import numpy as np
@@ -10,10 +11,10 @@ def peak_integration(dwell_peaks_dict):
     Integrate peaks from a given dwell temperature greater than or equal to 100 degrees Celcius data using the trapezoidal rule.
     Post-process by scaling and differentiating peak integrals to determine changes in atomic coordination numbers.
     Args:
-        dwell_peaks_dict = Dictionary of peak positions, within which keys are dwell temperatures and values are NumPy arrays of peak center/maximum indices.
+        dwell_peaks_dict = Dictionary of peak positions, within which keys are dwell temperatures and values are NumPy arrays of peak position indices.
     Returns:
         Dictionary of scaled peak integral differences written to a .npz file.
-        Keys are dwell temperatures and values are NumPy arrays of peak integral differences.
+        Keys are dwell temperatures and values are NumPy arrays of relative integral differences.
     """
     dwell_peak_integrals_dict = {}
 
@@ -38,7 +39,7 @@ def peak_integration(dwell_peaks_dict):
     (
         reference_dwell_peak_integrals_dict,
         dwell_peak_integral_differences_dict,
-    ) = peak_integral_differences(dwell_peak_integrals_dict, dwell_peaks_dict)
+    ) = peak_integral_differences(dwell_peaks_dict, dwell_peak_integrals_dict)
 
     np.savez(
         os.path.join("../data", "pdf_dwell_peak_integral_differences.npz"),
@@ -52,7 +53,7 @@ def integrate_peak_areas(g_r_data, peak_position_index):
     Peak minimums are determined by iteratively comparing magnitudes of intensity, starting from the maximum.
     Args:
         g_r_data = NumPy array of PDF G_r (y-axis) values.
-        peak_position_index = Index of the center position (maximum) of the peak to be integrated.
+        peak_position_index = Index of the position of the peak to be integrated.
     Returns:
         Definite integral of the specified peak.
     """
@@ -83,10 +84,10 @@ def scale_peak_integrals(peak_integrals_dict):
     Scale peaks integrals relative to corresponding reference integrals to standardize data across dwell temperatures.
     Scale factor is calculated with respect to the reference Si-O peak (~1.63 Angstroms).
     Args:
-        peak_integrals_dict = Dictionary of peak integrals, within which keys are dwell temperatures and values are NumPy arrays of peak integrals.
+        peak_integrals_dict = Dictionary of peak integrals, within which keys are dwell temperatures and values are NumPy arrays of definite integrals.
     Returns:
         Dictionary of standardized peak integrals for each dwell temperature.
-        Keys are dwell temperatures greater than the reference dwell temperature and values are NumPy arrays of scaled peak integrals.
+        Keys are dwell temperatures greater than the reference dwell temperature and values are NumPy arrays of scaled definite integrals.
     """
     # Set the first dwell temperature as the reference.
     reference_dwell_temperature = next(iter(peak_integrals_dict.keys()))
@@ -105,15 +106,15 @@ def scale_peak_integrals(peak_integrals_dict):
     return peak_integrals_dict
 
 
-def peak_integral_differences(peak_integrals_dict, peaks_dict):
+def peak_integral_differences(peaks_dict, peak_integrals_dict):
     """
     Determine peak integral differences relative to reference peak integrals.
     Args:
-        peak_integrals_dict = Dictionary of peak integrals, within which keys are dwell temperatures and values are NumPy arrays of scaled peak integrals.
-        peaks_dict = Dictionary of peak positons, within which keys are dwell temperatures and values are NumPy arrays of peak center/maximum indices.
+        peaks_dict = Dictionary of peak positions, within which keys are dwell temperatures and values are NumPy arrays of position indices.
+        peak_integrals_dict = Dictionary of peak integrals, within which keys are dwell temperatures and values are NumPy arrays of scaled definite integrals.
     Returns:
         Dictionary of reference peak integrals, dictionary of peak integral differences with respect to the reference.
-        Keys are peak position indices and values are peak integrals in the reference dictionary.
+        Keys are position indices and values are definite integrals in the reference dictionary.
         Keys are dwell temperatures greater than the reference and values are NumPy arrays of computed differences in the differences dictionary.
     """
     # Set the first dwell temperature as the reference.
@@ -135,24 +136,52 @@ def peak_integral_differences(peak_integrals_dict, peaks_dict):
     peak_integral_differences_dict = {}
     for dwell_temperature in peak_integrals_dict:
         if dwell_temperature > reference_dwell_temperature:
-            integral_differences_list = []
-            for ref_position in reference_peak_positions:
-                for shifted_position in peaks_dict[dwell_temperature]:
-                    if shifted_position in range(ref_position - 15, ref_position + 16):
-                        integral_differences_list.append(
-                            abs(
-                                (peak_integrals_dict[dwell_temperature])[
-                                    np.where(
-                                        peaks_dict[dwell_temperature]
-                                        == shifted_position
-                                    )
-                                ]
-                                - reference_peak_integrals_dict[ref_position]
-                            )[0]
-                        )
+            integral_differences_list = subtract_integrals(
+                dwell_temperature,
+                reference_peak_positions,
+                reference_peak_integrals_dict,
+                peaks_dict,
+                peak_integrals_dict,
+            )
 
             peak_integral_differences_dict[dwell_temperature] = np.array(
                 integral_differences_list
             )
 
     return reference_peak_integrals_dict, peak_integral_differences_dict
+
+
+def subtract_integrals(
+    dwell_temperature,
+    reference_peak_positions,
+    reference_peak_integrals_dict,
+    peaks_dict,
+    peak_integrals_dict,
+):
+    """
+    At each dwell temperature after the reference, find the (shifted) peak corresponding to a given reference peak and substract the respective integrals.
+    A subfunction/extension of peak_integral_differences function.
+    Args:
+        dwell_temperature = current dwell temperature greater than the reference dwell temperature.
+        reference_peak_positions = List of peak position indicies at the reference dwell temperature.
+        reference_peak_integrals_dict = Dictionary of reference integrals within which keys are peak position indices and values are definite integrals.
+        peaks_dict = Dictionary of peak positons, within which keys are dwell temperatures and values are NumPy arrays of position indices.
+        peak_integrals_dict = Dictionary of peak integrals, within which keys are dwell temperatures and values are NumPy arrays of scaled definite integrals.
+    Returns:
+        List of absolute values of differences between reference peak integrals and peak integrals of the current/specified dwell temperature.
+    """
+    integral_differences_list = []
+    for ref_position, shifted_position in itertools.product(
+        reference_peak_positions, peaks_dict[dwell_temperature]
+    ):
+        if shifted_position in range(ref_position - 15, ref_position + 16):
+            integral_differences_list.append(
+                abs(
+                    (peak_integrals_dict[dwell_temperature])[
+                        np.where(peaks_dict[dwell_temperature] == shifted_position)
+                    ]
+                    - reference_peak_integrals_dict[ref_position]
+                )[0]
+            )
+
+    return integral_differences_list
