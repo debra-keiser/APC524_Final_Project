@@ -5,4 +5,3 @@ gr_files/
 *.txt
 !user_input.txt
 *.md
-!user_input.txt
