@@ -3,4 +3,5 @@ gr_files/
 
 # Text and markdown documentation files
 *.txt
+!user_input.txt
 *.md
