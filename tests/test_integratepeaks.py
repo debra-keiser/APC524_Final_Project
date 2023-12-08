@@ -46,14 +46,14 @@ def test_peak_integral_differences():
         mock_peak_integrals_differences_dict,
     ) = peak_integral_differences(
         {
-            100: np.array([5, 6, 7]),
-            200: np.array([7, 8, 9]),
-            600: np.array([9, 10, 11]),
-        },
-        {
             100: np.array([150, 300, 550]),
             200: np.array([160, 305, 325]),
             600: np.array([170, 310, 400]),
+        },
+        {
+            100: np.array([5, 6, 7]),
+            200: np.array([7, 8, 9]),
+            600: np.array([9, 10, 11]),
         },
     )
 
