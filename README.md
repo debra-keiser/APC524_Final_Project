@@ -1,5 +1,6 @@
 # APC524 Group Project
 Pair Distribution Function Analysis of Time- and Temperature-Dependent Datasets
+
 Authors: Sophia Bergen, Debra Keiser, and Meddelin Setiawan
 
 This Python-based project automates the process of analyzing pair distribution function (PDF) data collected as the temperature varies over time.
