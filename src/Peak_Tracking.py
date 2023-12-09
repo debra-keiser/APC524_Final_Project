@@ -9,16 +9,17 @@ This script produces a matrix where each peak are tracked across different exper
 """
 # import os
 import numpy as np
-from Read_User_Input import read_user_input
 from tabulate import tabulate
 
+from src.Read_User_Input import read_user_input
 
-def calc_diff(dataset_to_track: int, position_index: int, current_position, matrix):
+
+def calc_diff(experiment_to_track: int, position_index: int, current_position, matrix):
     """
-    Calculates difference between position in previous and current dataset.
+    Calculates difference between position in previous and current experiment.
 
      Args:
-         dataset_to_track: dataset that is being updated in the Tracked Peak Matrix.
+         experiment_to_track: experiment that is being updated in the Tracked Peak Matrix.
          position_index: index of peak position being tracked.
          current_position: peak position being tracked.
 
@@ -26,10 +27,10 @@ def calc_diff(dataset_to_track: int, position_index: int, current_position, matr
          difference value
     """
     previous = 1
-    previous_position = matrix[dataset_to_track - previous, position_index]
+    previous_position = matrix[experiment_to_track - previous, position_index]
     while np.isnan(previous_position):
         previous += 1
-        previous_position = matrix[dataset_to_track - previous, position_index]
+        previous_position = matrix[experiment_to_track - previous, position_index]
     return previous_position - current_position
 
 
@@ -72,13 +73,13 @@ def track_peaks(threshold_distance: float):
     )  # make an empty matrix
     tracked_matrix[0, :] = first_experiment[
         temperature_point[0]
-    ]  # the first dataset is just being copied.
+    ]  # the peak positions in first experiment are just being copied.
 
     for i in range(1, total_experiments):
         file = np.load("./data/pdf_" + experiment_type[i] + "_peaks.npz")
-        p_ori = 0  # starting position index in original dataset.
+        p_ori = 0  # starting position index in original experiment.
         p_tracked = (
-            0  # starting position index in previous datasets in Tracked Peak Matrix.
+            0  # starting position index in previous experiments in Tracked Peak Matrix.
         )
 
         while p_tracked < len(tracked_matrix[i - 1, :]) and p_ori < len(
@@ -100,7 +101,7 @@ def track_peaks(threshold_distance: float):
                     diff2 = diff
 
                 if diff2 < diff:
-                    # Scenario 1: CURRENT DATASET DO NOT CONTAIN AN EXISTING PEAK FROM PREVIOUS DATASETS
+                    # Scenario 1: CURRENT EXPERIMENT DO NOT CONTAIN AN EXISTING PEAK FROM PREVIOUS experimentS
                     tracked_matrix[i, p_tracked] = "NaN"
                     p_tracked += 1
                 else:
@@ -113,7 +114,7 @@ def track_peaks(threshold_distance: float):
                 tracked_matrix[i, p_tracked] = "NaN"
                 p_tracked += 1
             elif diff > max_distance:
-                # Scenario 3: NEW PEAK EXIST IN CURRENT DATASET
+                # Scenario 3: NEW PEAK EXIST IN CURRENT EXPERIMENT
                 tracked_matrix = extend_matrix_length(tracked_matrix, p_tracked)
                 tracked_matrix[i, p_tracked] = file[temperature_point[i]][p_ori]
                 p_ori += 1
