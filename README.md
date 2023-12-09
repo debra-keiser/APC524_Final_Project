@@ -4,7 +4,7 @@ Authors: Sophia Bergen, Debra Keiser, and Meddelin Setiawan
 
 This Python-based project automates the process of analyzing pair distribution function (PDF) data collected as the temperature varies over time.
 
-The authors would like to acknowledge Professor Claire E. White and Dr. Karina M.L. Alventosa for the experimental data used in this analysis. More information about the experiment itself may be found [here](https://dataspace.princeton.edu/handle/88435/dsp01mg74qq26k)
+The authors would like to acknowledge Professor Claire E. White and Dr. Karina M.L. Alventosa for the experimental data used in this analysis. More information about the experiment itself may be found [here](https://dataspace.princeton.edu/handle/88435/dsp01mg74qq26k).
 
 
 # Usage
@@ -13,8 +13,9 @@ To create the environment required to execute the scripts, run:
 conda env create --name PDF_Time-Temp_Analysis -f environment.yml
 ```
 
-If the user is only interested in analyzing a small subset of peaks, they may indicate as such by adding peak labels/identifiers from the following lists into the user_input.txt file (do not move/remove "finish" from the end of the file):
-Keys for "dwell" peaks
+If the user is only interested in analyzing a small subset of peaks, they may indicate as such by adding peak labels/identifiers from the following lists into the user_input.txt file (do not move/remove "finish" from the end of the file).
+
+Keys for "dwell" peaks:
 [30, 100, 200, 300, 400, 500, 600, 700, 800, 900]
 
 Keys for "ramp" peaks:
