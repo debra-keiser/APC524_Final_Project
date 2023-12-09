@@ -7,11 +7,10 @@ Date Modified: 09DEC2023
 Description:
 This script produces a matrix where each peak are tracked across different experiments. The matrix is saved in "tracked_peak_matrix.txt"
 """
-# import os
-import numpy as np
-from tabulate import tabulate
 
+import numpy as np
 from src.Read_User_Input import read_user_input
+from tabulate import tabulate
 
 
 def calc_diff(experiment_to_track: int, position_index: int, current_position, matrix):
