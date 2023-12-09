@@ -56,7 +56,7 @@ def track_peaks(threshold_distance: float):
         threshold_distance: the maximum displacement (in 10^2 Angstroms) for peaks from 2 different experiments to be considered the same peak.
 
     returns
-        "tracked_peak_matrix.txt" file containing a matrix with tracked peaks.
+        "tracked_peak_matrix.txt", which is the file name containing tracking results.
     """
     # LOAD USER INPUT:
     experiment_type, temperature_point = read_user_input()
@@ -66,9 +66,7 @@ def track_peaks(threshold_distance: float):
     total_experiments = len(experiment_type)
 
     # Initialize tracked peak matrix.
-    first_experiment = np.load(
-        "peak_positions_npz/pdf_" + experiment_type[0] + "_peaks.npz"
-    )
+    first_experiment = np.load("./data/pdf_" + experiment_type[0] + "_peaks.npz")
     tracked_matrix = np.empty(
         (total_experiments, len(first_experiment[temperature_point[0]]))
     )  # make an empty matrix
@@ -77,7 +75,7 @@ def track_peaks(threshold_distance: float):
     ]  # the first dataset is just being copied.
 
     for i in range(1, total_experiments):
-        file = np.load("peak_positions_npz/pdf_" + experiment_type[i] + "_peaks.npz")
+        file = np.load("./data/pdf_" + experiment_type[i] + "_peaks.npz")
         p_ori = 0  # starting position index in original dataset.
         p_tracked = (
             0  # starting position index in previous datasets in Tracked Peak Matrix.
@@ -133,23 +131,19 @@ def track_peaks(threshold_distance: float):
                 p_tracked += 1
 
     # SAVING OUTPUT:
-
-    # SAVING RAW OUTPUT:
-    # output_file_path = os.path.join('../data/', 'raw_tracked_peak_matrix.txt')
-    np.savetxt("raw_tracked_peak_matrix.txt", tracked_matrix, fmt="%1.0f")
-
-    # SAVING TXT OUTPUT:
     non_nan_indices = ~np.isnan(tracked_matrix)  # Identify non-NaN elements
     tracked_matrix[non_nan_indices] = (
-        tracked_matrix[non_nan_indices] + 1
-    ) / 100  # changing the positions from index to distance in Angstroms
+        tracked_matrix[non_nan_indices] / 100
+    )  # changing the positions from index to distance in Angstroms
     headers = [f"Peak {i + 1}" for i in range(tracked_matrix.shape[1])]
     tracked_table = tabulate(tracked_matrix, headers, tablefmt="grid")
 
     # output_file_path = os.path.join('../data/', 'tracked_peak_matrix.txt')
-    with open("tracked_peak_matrix.txt", "w") as file:
+    with open("./data/tracked_peak_matrix.txt", "w") as file:
         file.write(tracked_table)
 
     print(
-        "The matrix containing tracked peaks has been saved as tracked_peak_matrix.txt!"
+        "Peak tracking is successful! The matrix containing tracked peaks has been saved as tracked_peak_matrix.txt in 'data' folder!"
     )
+
+    return "tracked_peak_matrix.txt"

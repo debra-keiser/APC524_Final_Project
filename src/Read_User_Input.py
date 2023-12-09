@@ -15,7 +15,7 @@ def read_user_input():
     experiment_type = np.array([])
     temperature_point = np.array([])
 
-    with open("user_input.txt") as file:
+    with open("./src/user_input.txt") as file:
         for line in file.readlines()[:-1]:
             fields = line.strip().split(",")
             experiment_type = np.append(experiment_type, fields[0])
@@ -23,3 +23,6 @@ def read_user_input():
 
     file.close()
     return experiment_type, temperature_point
+
+
+read_user_input()
