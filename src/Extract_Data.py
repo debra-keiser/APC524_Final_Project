@@ -1,3 +1,14 @@
+"""
+Extract_Data
+
+Author: Debra Keiser
+Date Modified: 09DEC2023
+
+Description:
+This script searches .gr files and saves PDF data for further analysis, such as rescaling and peak-finding.
+"""
+
+
 import os
 import re
 

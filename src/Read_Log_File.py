@@ -1,3 +1,14 @@
+"""
+Read_Log_File
+
+Author: Debra Keiser
+Date Modified: 09DEC2023
+
+Description:
+This script reads the log.txt file and extracts relevant details of experiment progress.
+"""
+
+
 import os
 import re
 from datetime import datetime

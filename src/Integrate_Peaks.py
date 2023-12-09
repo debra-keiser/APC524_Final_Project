@@ -1,3 +1,14 @@
+"""
+Integrate_Peaks
+
+Author: Debra Keiser
+Date Modified: 09DEC2023
+
+Description:
+This script integrates, standardizes, and calculates differences between PDF peaks from dwell temperature data.
+"""
+
+
 import itertools
 import os
 

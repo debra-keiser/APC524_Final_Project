@@ -1,3 +1,14 @@
+"""
+Analyze_PDF_Data
+
+Author: Debra Keiser
+Date Modified: 09DEC2023
+
+Description:
+This script executes all other scripts/functions required for the PDF analysis.
+"""
+
+
 import os
 
 import numpy as np

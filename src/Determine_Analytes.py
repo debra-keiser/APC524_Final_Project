@@ -1,3 +1,14 @@
+"""
+Determine_Analytes
+
+Author: Debra Keiser
+Date Modified: 09DEC2023
+
+Description:
+This script identifies extraneous data from the log.txt file and converts data of interest into a readable format.
+"""
+
+
 import numpy as np
 
 
