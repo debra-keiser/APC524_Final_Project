@@ -13,7 +13,7 @@ To create the environment required to execute the scripts, run:
 conda env create --name PDF_Time-Temp_Analysis -f environment.yml
 ```
 
-If the user is only interested in analyzing a small subset of peaks, they may indicate as such by adding peak labels/identifiers from the following lists into the user_input.txt file (do not move/remove "finish" from the end of the file).
+If the user is only interested in analyzing a small subset of peaks, they may indicate as such by adding PDF identifiers from the following lists into the user_input.txt file (do not move/remove "finish" from the end of the file).
 
 Keys for "dwell" peaks:
 [30, 100, 200, 300, 400, 500, 600, 700, 800, 900]
@@ -30,6 +30,4 @@ Keys for "ramp" peaks:
 900_00, 900_01, 900_02, 900_03, 900_04, 900_05, 900_06, 900_07, 900_08, 900_09,
 1000_00, 1000_01, 1000_02, 1000_03, 1000_04, 1000_05, 1000_06, 1000_07, 1000_08, 1000_09]
 
-For example:
-dwell,200
-ramp,1000_00
+For example: ramp,1000_00
