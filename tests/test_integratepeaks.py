@@ -42,7 +42,7 @@ def test_scale_peak_integrals():
 def test_peak_integral_differences():
     """Check that the expected reference and relative dictionaries are returned."""
     (
-        mock_reference_peak_integrals_dict,
+        mock_number_of_integrated_peaks,
         mock_peak_integrals_differences_dict,
     ) = peak_integral_differences(
         {
@@ -57,5 +57,5 @@ def test_peak_integral_differences():
         },
     )
 
-    assert mock_reference_peak_integrals_dict == {150: 5, 300: 6}
+    assert mock_number_of_integrated_peaks == 2
     assert len(mock_peak_integrals_differences_dict) == 2
