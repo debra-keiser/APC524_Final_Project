@@ -11,6 +11,7 @@ This script will generate a PDF displaying the results of various PDF analysis f
 
 from Plot_PDFs import Plot_multiple_PDFs
 from Plot_Total_Peaks import plot_total_peaks
+from Peak_Tracking import track_peaks
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
@@ -111,12 +112,14 @@ def create_report(file_path):
     story.append(PageBreak())
 
     # SECTION 3: QUANTIFYING PEAK POSITIONS
+    track_peaks(20) #specify threshold distance (see README.md)
     story.append(
         Paragraph(
             '<a name="page4"/>Section 3: Quantifying Peak Positions', styles["Heading1"]
         )
     )
     story.append(Paragraph("Contents of Section 3", styles["Normal"]))
+    
     story.append(PageBreak())
 
     # SECTION 4: PEAK INTEGRATION
