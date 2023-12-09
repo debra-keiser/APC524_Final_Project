@@ -1,0 +1,11 @@
+name: PDF_Analysis_for_Temperature-Dependent_Data
+channels:
+  - conda-forge
+dependencies:
+  - matplotlib >=3.7
+  - numpy >=1.20
+  - ordered-set =4.1
+  - pip
+  - python >=3.8
+  - reportlab >=4.0
+  - scipy >=1.2
