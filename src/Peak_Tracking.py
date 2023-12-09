@@ -7,6 +7,7 @@ Date Modified: 09DEC2023
 Description:
 This script produces a matrix where each peak are tracked across different experiments. The matrix is saved in "tracked_peak_matrix.txt"
 """
+# import os
 import numpy as np
 from Read_User_Input import read_user_input
 from tabulate import tabulate
@@ -132,12 +133,20 @@ def track_peaks(threshold_distance: float):
                 p_tracked += 1
 
     # SAVING OUTPUT:
+
+    # SAVING RAW OUTPUT:
+    # output_file_path = os.path.join('../data/', 'raw_tracked_peak_matrix.txt')
+    np.savetxt("raw_tracked_peak_matrix.txt", tracked_matrix, fmt="%1.0f")
+
+    # SAVING TXT OUTPUT:
     non_nan_indices = ~np.isnan(tracked_matrix)  # Identify non-NaN elements
     tracked_matrix[non_nan_indices] = (
         tracked_matrix[non_nan_indices] + 1
     ) / 100  # changing the positions from index to distance in Angstroms
     headers = [f"Peak {i + 1}" for i in range(tracked_matrix.shape[1])]
     tracked_table = tabulate(tracked_matrix, headers, tablefmt="grid")
+
+    # output_file_path = os.path.join('../data/', 'tracked_peak_matrix.txt')
     with open("tracked_peak_matrix.txt", "w") as file:
         file.write(tracked_table)
 
