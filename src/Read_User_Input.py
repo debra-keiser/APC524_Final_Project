@@ -23,6 +23,3 @@ def read_user_input():
 
     file.close()
     return experiment_type, temperature_point
-
-
-read_user_input()
