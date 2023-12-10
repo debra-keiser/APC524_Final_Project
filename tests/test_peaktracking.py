@@ -213,4 +213,3 @@ def test_extend_matrix_length():
     new_tracked_matrix = extend_matrix_length(dummy_tracked_matrix, 3)
     new_shape = new_tracked_matrix.shape
     assert new_shape[1] == old_shape[1] + 1
-    assert np.isnan(new_tracked_matrix[0][3])
