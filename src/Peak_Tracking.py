@@ -9,8 +9,9 @@ This script produces a matrix where each peak are tracked across different exper
 """
 
 import numpy as np
-from src.Read_User_Input import read_user_input
 from tabulate import tabulate
+
+from src.Read_User_Input import read_user_input
 
 
 def calc_diff(experiment_to_track: int, position_index: int, current_position, matrix):

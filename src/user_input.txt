@@ -1,4 +1,11 @@
+dwell,30
+dwell,100
+dwell,200
 dwell,300
 dwell,400
-ramp,500_01
+dwell,500
+dwell,600
+dwell,700
+dwell,800
+dwell,900
 finish
