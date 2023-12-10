@@ -27,8 +27,7 @@ def peak_integration(dwell_peaks_dict):
     Args:
         dwell_peaks_dict = Dictionary of peak positions, within which keys are dwell temperatures and values are NumPy arrays of peak positions.
     Returns:
-        Dictionary of scaled peak integral differences written to a .npz file.
-        Keys are dwell temperatures and values are NumPy arrays of relative integral differences.
+        None.
     """
     integrated_dwell_temperatures = []
     dwell_peak_integrals_dict = {}
