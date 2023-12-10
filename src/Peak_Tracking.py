@@ -136,8 +136,15 @@ def track_peaks(threshold_distance: float):
     tracked_matrix[non_nan_indices] = (
         tracked_matrix[non_nan_indices] / 100
     )  # changing the positions from index to distance in Angstroms
+    tracked_matrix_list = tracked_matrix.tolist()
+    for i in range(len(tracked_matrix_list)):
+        tracked_matrix_list[i].insert(
+            0, experiment_type[i] + " " + temperature_point[i]
+        )
+
     headers = [f"Peak {i + 1}" for i in range(tracked_matrix.shape[1])]
-    tracked_table = tabulate(tracked_matrix, headers, tablefmt="grid")
+    headers = np.insert(headers, 0, "PDF")
+    tracked_table = tabulate(tracked_matrix_list, headers, tablefmt="grid")
 
     # output_file_path = os.path.join('../data/', 'tracked_peak_matrix.txt')
     with open("./data/tracked_peak_matrix.txt", "w") as file:
