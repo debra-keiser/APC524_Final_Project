@@ -1,11 +1,6 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling<=1.18.0"]
 build-backend = "hatchling.build"
-
-[tool.hatch.build.targets.wheel]
-exclude = [
-  "*.txt",
-]
 
 [project]
 name = "APC524-Fall-2023-Group-Project_PDF-Data-Analysis"
