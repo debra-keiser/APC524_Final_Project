@@ -2,7 +2,7 @@
 Analyze_PDF_Data
 
 Author: Debra Keiser
-Date Modified: 09DEC2023
+Date Modified: 11DEC2023
 
 Description:
 This script executes all other scripts/functions required for the PDF analysis.
@@ -40,4 +40,4 @@ np.savez(os.path.join("../data", "pdf_ramp_peaks.npz"), **pdf_ramp_peaks_dict)
 np.savez(os.path.join("../data", "pdf_dwell_peaks.npz"), **pdf_dwell_peaks_dict)
 
 plot_total_peaks("../data", "pdf_ramp_peaks.npz")
-peak_integration(pdf_dwell_peaks_dict)
+peak_integration("../data", "pdf_dwell_peaks.npz")

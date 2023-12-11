@@ -2,7 +2,7 @@
 Integrate_Peaks
 
 Author: Debra Keiser
-Date Modified: 09DEC2023
+Date Modified: 11DEC2023
 
 Description:
 This script integrates, standardizes, and calculates differences between PDF peaks from dwell temperature data to observe how atomic coorindation number changes with increasing temperature.
@@ -20,7 +20,7 @@ from pandas.plotting import table
 from src.Extract_Data import extract_pdf_data
 
 
-def peak_integration(dwell_peaks_dict):
+def peak_integration(file_directory, npz_file_to_read):
     """
     Integrate peaks from a given dwell temperature greater than or equal to 100 degrees Celcius data using the trapezoidal rule.
     Post-process by scaling and differentiating peak integrals to determine changes in atomic coordination numbers.
@@ -29,6 +29,12 @@ def peak_integration(dwell_peaks_dict):
     Returns:
         None.
     """
+    # Extract keys and values from the .npz file and store in a new dictionary.
+    dwell_peaks_dict = {}
+    with np.load(os.path.join(file_directory, npz_file_to_read)) as open_npz_file:
+        for item in open_npz_file:
+            dwell_peaks_dict[item] = open_npz_file[item]
+
     integrated_dwell_temperatures = []
     dwell_peak_integrals_dict = {}
     # Retrieve PDF data from each .gr file containing data from the dwell temperature segments.
