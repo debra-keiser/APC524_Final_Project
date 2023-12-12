@@ -2,10 +2,10 @@
 Determine_Analytes
 
 Author: Debra Keiser
-Date Modified: 09DEC2023
+Date Modified: 12DEC2023
 
 Description:
-This script identifies extraneous data from the log.txt file and converts data of interest into a readable format.
+This script identifies extraneous data from the log.txt file and creates lists that index data of interest.
 """
 
 
