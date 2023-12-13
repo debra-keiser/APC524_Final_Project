@@ -26,7 +26,7 @@ def peak_integration(npz_file_and_directory, save_path):
     Args:
         dwell_peaks_dict = Dictionary of peak positions, within which keys are dwell temperatures and values are NumPy arrays of peak positions.
     Returns:
-        None.
+        Input save path to facilitate addition of PNG to the final report.
     """
     # Extract keys and values from the .npz file and store in a new dictionary.
     dwell_peaks_dict = {}
@@ -67,6 +67,8 @@ def peak_integration(npz_file_and_directory, save_path):
         dwell_peak_integral_differences_dict,
         save_path,
     )
+
+    return save_path
 
 
 def integrate_peak_areas(g_r_data, peak_position_index):
