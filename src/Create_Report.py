@@ -1,16 +1,23 @@
-"""""
+"""
 Create_Report
 
-Author: Sophia Bergen
-Date Modified: 08DEC2023
+Author: Sophia Bergen and Debra Keiser
+Date Modified: 13DEC2023
 
 Description:
-This script will generate a PDF displaying the results of various PDF analysis functions.
-""" ""
+This script retrieves PDF data, saves peak positions, and generates a portable document file displaying the results of various PDF analysis functions.
+"""
 
 # from Peak_Tracking import track_peaks
+import os
+
+import numpy as np
+from Determine_Analytes import get_analyte_data
+from Extract_Data import get_gr_files
+from Integrate_Peaks import peak_integration
 from Plot_PDFs import Plot_multiple_PDFs
 from Plot_Total_Peaks import plot_total_peaks
+from Read_Log_File import extract_time_temp_data
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
@@ -21,6 +28,33 @@ from reportlab.platypus import (
     SimpleDocTemplate,
     Spacer,
 )
+
+
+def preliminary_analysis():
+    """
+    Analyze time- and temperature-dependent pair distribution function (PDF) data.
+    Details about the experiment are read from a log.txt file, and pair distribution function data are stored as .gr files.
+    Args:
+        None.
+    Returns:
+        Prints two NPZ files containing dictionaries of peaks from ramp and dwell data.
+    """
+    (
+        recorded_times_from_experiment,
+        recorded_temperatures_from_experiment,
+        rounded_temperatures,
+    ) = extract_time_temp_data("../data", "log.txt")
+
+    analyte_times, analyte_temperatures = get_analyte_data(
+        recorded_times_from_experiment,
+        recorded_temperatures_from_experiment,
+        rounded_temperatures,
+    )
+
+    pdf_ramp_peaks_dict, pdf_dwell_peaks_dict = get_gr_files(rounded_temperatures)
+
+    np.savez(os.path.join("../data", "pdf_ramp_peaks.npz"), **pdf_ramp_peaks_dict)
+    np.savez(os.path.join("../data", "pdf_dwell_peaks.npz"), **pdf_dwell_peaks_dict)
 
 
 def create_report(file_path):
@@ -96,14 +130,15 @@ def create_report(file_path):
     )
     story.append(
         Paragraph(
-            "This section visualizes phase changes by counting the total number of peaks in PDF files across temperatures",
+            "This section visualizes phase changes by counting the total number of peaks in PDF files across temperatures.",
             styles["Normal"],
         )
     )
 
-    npz = "./data/pdf_ramp_peaks.npz"
+    ramp_npz = "../data/pdf_ramp_peaks.npz"
+    dwell_npz = "../data/pdf_dwell_peaks.npz"
     image_filename2 = plot_total_peaks(
-        npz, save_path="./data/images/total_peaks_histogram.png"
+        ramp_npz, save_path="../data/images/total_peaks_histogram.png"
     )
     img = Image(image_filename2)
 
@@ -132,12 +167,12 @@ def create_report(file_path):
     )
     story.append(
         Paragraph(
-            "This table lists relative differences between reference peak integrals (denoted 0) at a given temperature and peak integrals calculated at higher temperatures. These values are indicative of changes that occur to atomic coordination numbers as the structure of C-S-H changes",
+            "This table lists relative differences between reference peak integrals (denoted 0) at a given temperature and peak integrals calculated at higher temperatures. These values are indicative of changes that occur to atomic coordination numbers as the structure of C-S-H changes.",
             styles["Normal"],
         )
     )
-    image_filename4 = (
-        "./data/images/Dwell_Temperature_Atomic_Coordination_Number_Changes.png"
+    image_filename4 = peak_integration(
+        dwell_npz, save_path="../data/images/peak_integral_differences.png"
     )
     img = Image(image_filename4)
 
@@ -150,7 +185,9 @@ def create_report(file_path):
 
 
 # usage:
-output_file_path = "./data/final_output_report.pdf"
+preliminary_analysis()
 
+output_file_path = "../data/final_output_report.pdf"
 create_report(output_file_path)
+
 print(f"Report generated: {output_file_path}")
