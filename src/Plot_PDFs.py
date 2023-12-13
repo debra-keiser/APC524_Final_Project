@@ -108,7 +108,7 @@ def Plot_multiple_PDFs():
 
     g_r1 = rescale_g_r(g_r1)
     # Call plot_peaks with the datasets for the full r-range plot.
-    total_plot_filename = "../data/total_peaks_and_PDFs.png"
+    total_plot_filename = "../data/images/total_peaks_and_PDFs.png"
     plot_peaks(
         [r1, r2, r3, r4],
         [g_r1, g_r2, g_r3, g_r4],
@@ -117,7 +117,7 @@ def Plot_multiple_PDFs():
     )
 
     # Call plot_zoomed_peaks with the four datasets for the zoomed-in plot.
-    zoomed_plot_filename = "../data/zoomed_peaks_and_PDFs2.png"
+    zoomed_plot_filename = "../data/images/zoomed_peaks_and_PDFs2.png"
     plot_zoomed_peaks(
         [r1, r2, r3, r4],
         [g_r1, g_r2, g_r3, g_r4],
