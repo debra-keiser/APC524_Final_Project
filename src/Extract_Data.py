@@ -2,7 +2,7 @@
 Extract_Data
 
 Author: Debra Keiser
-Date Modified: 09DEC2023
+Date Modified: 12DEC2023
 
 Description:
 This script searches .gr files and saves PDF data for further analysis, such as rescaling and peak-finding.
@@ -19,10 +19,10 @@ from scipy.signal import find_peaks
 from src.Determine_Analytes import divide_by_100
 
 
-def get_pdf_data(rounded_temperatures):
+def get_gr_files(rounded_temperatures):
     """
-    Extract data from each .gr file of interest.
-    Repetitive/Extraneous files are skipped by converting the list in to an ordered set.
+    Iterate over and extract data from each .gr file of interest.
+    Convert the list of rounded temperatures to an ordered set to avoid double-counting.
     Args:
         rounded_temperatures: List of rounded temperature values.
     Returns:

@@ -2,7 +2,7 @@
 Determine_Analytes
 
 Author: Debra Keiser
-Date Modified: 12DEC2023
+Date Modified: 13DEC2023
 
 Description:
 This script identifies extraneous data from the log.txt file and creates lists that index data of interest.
@@ -12,7 +12,7 @@ This script identifies extraneous data from the log.txt file and creates lists t
 import numpy as np
 
 
-def analyte_data(
+def get_analyte_data(
     recorded_times_from_experiment,
     recorded_temperatures_from_experiment,
     rounded_temperatures,

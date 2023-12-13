@@ -6,7 +6,7 @@ import numpy as np
 from src.Extract_Data import rescale_g_r
 
 
-def test_r_gr_extraction():
+def test_extract_pdf_data():
     """Check that the NumPy arrays of all r and g_r data are equal and can therefore be plotted."""
     for filename in os.listdir("data/gr_files"):
         if filename.endswith(".gr"):
@@ -26,7 +26,7 @@ def test_r_gr_extraction():
             assert len(g_r) == 6001
 
 
-def test_rescaling():
+def test_rescale_g_r():
     """Check that g_r data is scaled appropriately to the correct peak intensity."""
     with open(
         os.path.join(
