@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def plot_total_peaks(npz_file, save_path="total_peaks_histogram.png"):
+def plot_total_peaks(npz_file, save_path):
     """
     Identify and plot how the number of peaks changes across PDF samples.
 
