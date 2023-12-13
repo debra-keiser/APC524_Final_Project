@@ -1,20 +1,20 @@
 from src.Determine_Analytes import (
-    analyte_data,
     divide_by_100,
+    get_analyte_data,
     list_item_differences,
     times_of_target_occurrence,
 )
 from src.Read_Log_File import extract_time_temp_data
 
 
-def test_analyte_data():
+def test_get_analyte_data():
     """Check that the number of analyte times and temperatures are equal."""
     (
         recorded_times_from_experiment,
         recorded_temperatures_from_experiment,
         rounded_temperatures,
     ) = extract_time_temp_data("data/", "log.txt")
-    analyte_times, analyte_temperatures = analyte_data(
+    analyte_times, analyte_temperatures = get_analyte_data(
         recorded_times_from_experiment,
         recorded_temperatures_from_experiment,
         rounded_temperatures,
