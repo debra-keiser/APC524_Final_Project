@@ -2,7 +2,7 @@
 PDF Plotting Functions
 
 Author: Sophia Bergen
-Date Modified: 06DEC2023
+Date Modified: 13DEC2023
 
 Description:
 This file contains all functions related to plotting the PDF data
@@ -94,21 +94,21 @@ def Plot_multiple_PDFs():
     - zoomed_plot_filename (str): Filename or path of the saved PNG file containing the zoomed-in plot.
     """
     r1, g_r1 = extract_pdf_data(
-        "./data/gr_files", "Synthetic_CSH_030degC_normalized.gr"
+        "../data/gr_files", "Synthetic_CSH_030degC_normalized.gr"
     )
     r2, g_r2 = extract_pdf_data(
-        "./data/gr_files", "Synthetic_CSH_CSH_pdf_ramp_300_09_normalized.gr"
+        "../data/gr_files", "Synthetic_CSH_CSH_pdf_ramp_300_09_normalized.gr"
     )
     r3, g_r3 = extract_pdf_data(
-        "./data/gr_files", "Synthetic_CSH_CSH_pdf_ramp_600_09_normalized.gr"
+        "../data/gr_files", "Synthetic_CSH_CSH_pdf_ramp_600_09_normalized.gr"
     )
     r4, g_r4 = extract_pdf_data(
-        "./data/gr_files", "Synthetic_CSH_CSH_pdf_ramp_1000_09_normalized.gr"
+        "../data/gr_files", "Synthetic_CSH_CSH_pdf_ramp_1000_09_normalized.gr"
     )
 
     g_r1 = rescale_g_r(g_r1)
     # Call plot_peaks with the datasets for the full r-range plot.
-    total_plot_filename = "./data/total_peaks_and_PDFs.png"
+    total_plot_filename = "../data/total_peaks_and_PDFs.png"
     plot_peaks(
         [r1, r2, r3, r4],
         [g_r1, g_r2, g_r3, g_r4],
@@ -117,7 +117,7 @@ def Plot_multiple_PDFs():
     )
 
     # Call plot_zoomed_peaks with the four datasets for the zoomed-in plot.
-    zoomed_plot_filename = "./data/zoomed_peaks_and_PDFs2.png"
+    zoomed_plot_filename = "../data/zoomed_peaks_and_PDFs2.png"
     plot_zoomed_peaks(
         [r1, r2, r3, r4],
         [g_r1, g_r2, g_r3, g_r4],

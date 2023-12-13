@@ -2,7 +2,7 @@
 Peak_Tracking
 
 Author: Meddelin Setiawan
-Date Modified: 09DEC2023
+Date Modified: 13DEC2023
 
 Description:
 This script produces a matrix where each peak are tracked across different experiments. The matrix is saved in "tracked_peak_matrix.txt"
@@ -147,7 +147,7 @@ def track_peaks(threshold_distance: float):
     tracked_table = tabulate(tracked_matrix_list, headers, tablefmt="grid")
 
     # output_file_path = os.path.join('../data/', 'tracked_peak_matrix.txt')
-    with open("./data/tracked_peak_matrix.txt", "w") as file:
+    with open("../data/tracked_peak_matrix.txt", "w") as file:
         file.write(tracked_table)
 
     print(

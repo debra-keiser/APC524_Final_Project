@@ -2,7 +2,7 @@
 Integrate_Peaks
 
 Author: Debra Keiser
-Date Modified: 11DEC2023
+Date Modified: 13DEC2023
 
 Description:
 This script integrates, standardizes, and calculates differences between PDF peaks from dwell temperature data to observe how atomic coorindation number changes with increasing temperature.
@@ -10,7 +10,6 @@ This script integrates, standardizes, and calculates differences between PDF pea
 
 
 import itertools
-import os
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -20,7 +19,7 @@ from pandas.plotting import table
 from src.Extract_Data import extract_pdf_data
 
 
-def peak_integration(file_directory, npz_file_to_read):
+def peak_integration(npz_file_and_directory, save_path):
     """
     Integrate peaks from a given dwell temperature greater than or equal to 100 degrees Celcius data using the trapezoidal rule.
     Post-process by scaling and differentiating peak integrals to determine changes in atomic coordination numbers.
@@ -31,7 +30,7 @@ def peak_integration(file_directory, npz_file_to_read):
     """
     # Extract keys and values from the .npz file and store in a new dictionary.
     dwell_peaks_dict = {}
-    with np.load(os.path.join(file_directory, npz_file_to_read)) as open_npz_file:
+    with np.load(npz_file_and_directory) as open_npz_file:
         for item in open_npz_file:
             dwell_peaks_dict[item] = open_npz_file[item]
 
@@ -66,6 +65,7 @@ def peak_integration(file_directory, npz_file_to_read):
         number_of_integrated_peaks,
         dwell_peak_integrals_dict,
         dwell_peak_integral_differences_dict,
+        save_path,
     )
 
 
@@ -213,7 +213,7 @@ def subtract_integrals(
 
 
 def create_table(
-    n_integrated_peaks, peak_integrals_dict, peak_integral_differences_dict
+    n_integrated_peaks, peak_integrals_dict, peak_integral_differences_dict, save_path
 ):
     """
     Create a table that contains computed changes in peak integrals with respect to the reference dwell temperature and integrals.
@@ -244,8 +244,6 @@ def create_table(
     ax.axis("off")
     table(ax, df, loc="center")
     plt.savefig(
-        os.path.join(
-            "../data/images", "Dwell_Temperature_Atomic_Coordination_Number_Changes.png"
-        ),
+        save_path,
         bbox_inches="tight",
     )

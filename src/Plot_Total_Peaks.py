@@ -1,12 +1,12 @@
-"""""
+"""
 Plot_Total_Peaks
 
 Author: Sophia Bergen
-Date Modified: 07DEC2023
+Date Modified: 13DEC2023
 
 Description:
 This script contains a function to analyze peak distribution across PDF files and generate a histogram.
-""" ""
+"""
 import matplotlib.pyplot as plt
 import numpy as np
 
