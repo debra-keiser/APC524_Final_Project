@@ -8,8 +8,7 @@ Description:
 This script will generate a PDF displaying the results of various PDF analysis functions.
 """ ""
 
-
-from Peak_Tracking import track_peaks
+# from Peak_Tracking import track_peaks
 from Plot_PDFs import Plot_multiple_PDFs
 from Plot_Total_Peaks import plot_total_peaks
 from reportlab.lib.enums import TA_CENTER
@@ -103,7 +102,9 @@ def create_report(file_path):
     )
 
     npz = "./data/pdf_ramp_peaks.npz"
-    image_filename2 = plot_total_peaks(npz, save_path="total_peaks_histogram.png")
+    image_filename2 = plot_total_peaks(
+        npz, save_path="./data/images/total_peaks_histogram.png"
+    )
     img = Image(image_filename2)
 
     img.drawWidth = 600
@@ -112,21 +113,38 @@ def create_report(file_path):
     story.append(PageBreak())
 
     # SECTION 3: QUANTIFYING PEAK POSITIONS
-    track_peaks(20)  # specify threshold distance (see README.md)
     story.append(
         Paragraph(
             '<a name="page4"/>Section 3: Quantifying Peak Positions', styles["Heading1"]
         )
     )
-    story.append(Paragraph("Contents of Section 3", styles["Normal"]))
-
+    story.append(
+        Paragraph(
+            "The results of quanitfying peak postions are in text file called tracked_peak_matrix.txt in the data folder!",
+            styles["Normal"],
+        )
+    )
     story.append(PageBreak())
 
     # SECTION 4: PEAK INTEGRATION
     story.append(
         Paragraph('<a name="page4"/>Section 4: Peak Integration', styles["Heading1"])
     )
-    story.append(Paragraph("Contents of Section 3", styles["Normal"]))
+    story.append(
+        Paragraph(
+            "This table lists relative differences between reference peak integrals (denoted 0) at a given temperature and peak integrals calculated at higher temperatures. These values are indicative of changes that occur to atomic coordination numbers as the structure of C-S-H changes",
+            styles["Normal"],
+        )
+    )
+    image_filename4 = (
+        "./data/images/Dwell_Temperature_Atomic_Coordination_Number_Changes.png"
+    )
+    img = Image(image_filename4)
+
+    img.drawWidth = 600
+    img.drawHeight = 400
+    story.append(img)
+    story.append(PageBreak())
 
     doc.build(story)
 
