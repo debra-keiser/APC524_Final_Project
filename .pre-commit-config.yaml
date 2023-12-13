@@ -7,11 +7,11 @@ repos:
       - id: check-merge-conflict
       - id: debug-statements
       - id: end-of-file-fixer
-        exclude: data/log.txt|src/user_input.txt
+        exclude: data/log.txt|data/tracked_peak_matrix.txt|src/user_input.txt
       - id: mixed-line-ending
-        exclude: data/log.txt|src/user_input.txt
+        exclude: data/log.txt|data/tracked_peak_matrix.txt|src/user_input.txt
       - id: trailing-whitespace
-        exclude: data/log.txt|src/user_input.txt
+        exclude: data/log.txt|data/tracked_peak_matrix.txt|src/user_input.txt
   - repo: https://github.com/psf/black-pre-commit-mirror
     rev: "23.9.1"
     hooks:
