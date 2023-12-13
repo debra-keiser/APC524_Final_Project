@@ -1,30 +1,35 @@
-# APC524 Group Project
-## Pair Distribution Function Analysis of Time- and Temperature-Dependent Datasets
+# Automated PDF Analysis
+## Automated Pair Distribution Function Analysis for Assessing Reaction Progress
 
 Authors: Sophia Bergen, Debra Keiser, and Meddelin Setiawan
 
-This Python-based project automates the process of analyzing pair distribution function (PDF) data collected as the temperature varies over time.
+This Python-based project computerizes the process of analyzing pair distribution function (PDF) data collected as the temperature varies over time.
 
 The authors would like to acknowledge Professor Claire E. White and Dr. Karina M.L. Alventosa for the experimental data used in this analysis. More information about the experiment itself may be found [here](https://dataspace.princeton.edu/handle/88435/dsp01mg74qq26k).
 
 # USAGE
 ## Environment
-To create the environment required to execute the scripts, run:
+To clone this GitHub repository to your local machine, run:
 ```
-conda env create --name PDF_Time-Temp_Analysis -f environment.yml
-conda activate PDF_Time-Temp_Analysis
+git clone https://github.com/debra-keiser/Automated_PDF_Analysis.git
+```
+Create the environment required to execute the scripts from the home directory of this repository with:
+```
+conda env create --name Auto_PDF_Analysis -f environment.yml
+conda activate Auto_PDF_Analysis
 ```
 ## Execution
 Create_Report.py executes all other scripts to analyze PDF data. Run:
 ```
+cd src/
 python Create_Report.py
 ```
-Input log.txt and .gr files are stored in /data/ and /data/gr_files, respectively. A description detailing the purpose of each script/function is provided in its respective file.
+Input log.txt and .gr files are stored in data/ and data/gr_files, respectively. A description detailing the purpose of each script/function is provided in its respective file.
 
-/src/Plot_Total_Peaks.py, /src/Plot_PDFs.py, /src/Peak_Tracking.py, and /src/Integrate_Peaks.py may also be run as standalone scripts.
+src/Plot_Total_Peaks.py, src/Plot_PDFs.py, src/Peak_Tracking.py, and src/Integrate_Peaks.py may also be run as standalone scripts after Create_Report.py has been executed once.
 
 ## User Input
-/src/Plot_Total_Peaks.py, /src/Plot_PDFs.py, and /src/Peak_Tracking.py require that the user indicates which PDF file(s) they are interested in analyzing by lising the corresponding key(s) in /src/user_input.txt (do not move/remove "finish" from the end of the file).
+src/Peak_Tracking.py require that the user indicates which PDF file(s) they are interested in analyzing by lising the corresponding key(s) in src/user_input.txt (do not move/remove "finish" from the end of the file).
 
 Example syntax:
 ramp,1000_00
@@ -45,4 +50,4 @@ Keys for "ramp" peaks:
 1000_00, 1000_01, 1000_02, 1000_03, 1000_04, 1000_05, 1000_06, 1000_07, 1000_08, 1000_09]
 
 ## Output
-All results are stored in /data/ and /data/images. The main output is a portable document file (final_output_report.pdf) that contains plots and tables generated during the analysis. These plots and tables, in addition to .npz files of peak positions, are also saved and stored individually.
+All results are stored in data/ and data/images. The main output is a portable document file (final_output_report.pdf) that contains plots and tables generated during the analysis. These plots and tables, in addition to .npz files of peak positions, are also saved and stored individually.
