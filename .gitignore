@@ -5,3 +5,6 @@ gr_files/
 *.txt
 !user_input.txt
 *.md
+
+# Allow tracked_peak_matrix.txt
+!tracked_peak_matrix.txt
