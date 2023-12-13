@@ -3,8 +3,8 @@ gr_files/
 
 # Text and markdown documentation files
 *.txt
-!user_input.txt
 *.md
 
-# Allow tracked_peak_matrix.txt
+# Allow user_input.txt and tracked_peak_matrix.txt
+!user_input.txt
 !tracked_peak_matrix.txt
