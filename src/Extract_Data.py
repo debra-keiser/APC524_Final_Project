@@ -27,7 +27,7 @@ def get_gr_files(rounded_temperatures):
         rounded_temperatures: List of rounded temperature values.
     Returns:
         Dictionary of ramp data, dictionary of dwell data.
-        Keys are identifying temperatures/intervals and values are NumPy arrays of peak positions.
+        Keys are identifying temperatures (with intervals for ramp data) and values are NumPy arrays of peak positions.
     """
     pdf_ramp_peaks_dict = {}
     pdf_dwell_peaks_dict = {}
