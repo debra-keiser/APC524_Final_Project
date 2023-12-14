@@ -2,7 +2,7 @@
 Integrate_Peaks
 
 Author: Debra Keiser
-Date Modified: 13DEC2023
+Date Modified: 14DEC2023
 
 Description:
 This script integrates, standardizes, and calculates differences between PDF peaks from dwell temperature data to observe how atomic coorindation number changes with increasing temperature.
@@ -243,6 +243,7 @@ def create_table(
     df.index = df_row_names
     df.columns = df_column_names
     ax = plt.subplot(111, frame_on=False)
+    ax.set_title("Relative Changes to Atomic Coordination Numbers with Temperature")
     ax.axis("off")
     table(ax, df, loc="center")
     plt.savefig(
