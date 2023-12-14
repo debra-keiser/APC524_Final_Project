@@ -243,9 +243,10 @@ def create_table(
     df.index = df_row_names
     df.columns = df_column_names
     ax = plt.subplot(111, frame_on=False)
-    ax.set_title("Relative Changes to Atomic Coordination Numbers with Temperature")
     ax.axis("off")
-    table(ax, df, loc="center")
+    ax.set_title("Relative Changes to Atomic Coordination Numbers with Temperature")
+    table(ax, df, loc="upper center")
+    plt.tight_layout()
     plt.savefig(
         save_path,
         bbox_inches="tight",
