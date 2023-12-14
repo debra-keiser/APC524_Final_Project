@@ -18,7 +18,7 @@ Create the environment required to execute the scripts from the home directory o
 conda env create --name Auto_PDF_Analysis -f environment.yml
 conda activate Auto_PDF_Analysis
 ```
-Before execution, remove src. from function imports in Extract_Data.py and Integrate_Peaks.py (included for testing purposes only).
+Before execution, remove src. from function imports in Extract_Data.py, Peak_Tracking.py, and Integrate_Peaks.py (included for testing purposes only).
 ## Execution
 Create_Report.py executes all other scripts to analyze PDF data. In the src/ directory, run:
 ```
