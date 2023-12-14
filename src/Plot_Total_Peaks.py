@@ -2,7 +2,7 @@
 Plot_Total_Peaks
 
 Author: Sophia Bergen
-Date Modified: 13DEC2023
+Date Modified: 14DEC2023
 
 Description:
 This script contains a function to analyze peak distribution across PDF files and generate a histogram.
@@ -42,6 +42,7 @@ def plot_total_peaks(npz_file, save_path):
     values_to_display = [num_peaks[key] for key in keys_to_display]
 
     plt.bar(range(len(keys_to_display)), values_to_display, color="g")
+    plt.title("Total Number of Peaks per PDF")
     plt.xlabel("File Name")
     plt.ylabel("Number of Peaks")
 
