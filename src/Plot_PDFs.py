@@ -117,7 +117,7 @@ def Plot_multiple_PDFs():
     )
 
     # Call plot_zoomed_peaks with the four datasets for the zoomed-in plot.
-    zoomed_plot_filename = "../data/images/zoomed_peaks_and_PDFs2.png"
+    zoomed_plot_filename = "../data/images/zoomed_peaks_and_PDFs.png"
     plot_zoomed_peaks(
         [r1, r2, r3, r4],
         [g_r1, g_r2, g_r3, g_r4],
