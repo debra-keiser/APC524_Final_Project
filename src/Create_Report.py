@@ -103,7 +103,7 @@ def create_report(file_path):
     story.append(
         Paragraph('<a name="page2"/>Section 1: PDF Curve Plotting', styles["Heading1"])
     )
-    story.append(Paragraph("This section visualizes the PDF data. .", styles["Normal"]))
+    story.append(Paragraph("This section visualizes the PDF data.", styles["Normal"]))
     # add plot of PDFs on same figure
 
     total_img, zoom_img = Plot_multiple_PDFs()
@@ -130,7 +130,7 @@ def create_report(file_path):
     )
     story.append(
         Paragraph(
-            "This section visualizes phase changes by counting the total number of peaks in PDF files across temperatures. .",
+            "This section visualizes phase changes by counting the total number of peaks in PDF files across temperatures.",
             styles["Normal"],
         )
     )
@@ -167,7 +167,7 @@ def create_report(file_path):
     )
     story.append(
         Paragraph(
-            "This table lists relative differences between reference peak integrals (denoted 0) at a given temperature and peak integrals calculated at higher temperatures. These values are indicative of changes that occur to atomic coordination numbers as the structure of C-S-H changes. .",
+            "This table lists relative differences between reference peak integrals (denoted 0) at a given temperature and peak integrals calculated at higher temperatures. These values are indicative of changes that occur to atomic coordination numbers as the structure of C-S-H changes.",
             styles["Normal"],
         )
     )
