@@ -67,7 +67,7 @@ def track_peaks(threshold_distance: float):
     total_experiments = len(experiment_type)
 
     # Initialize tracked peak matrix.
-    first_experiment = np.load("./data/pdf_" + experiment_type[0] + "_peaks.npz")
+    first_experiment = np.load("../data/pdf_" + experiment_type[0] + "_peaks.npz")
     tracked_matrix = np.empty(
         (total_experiments, len(first_experiment[temperature_point[0]]))
     )  # make an empty matrix
@@ -76,7 +76,7 @@ def track_peaks(threshold_distance: float):
     ]  # the peak positions in first experiment are just being copied.
 
     for i in range(1, total_experiments):
-        file = np.load("./data/pdf_" + experiment_type[i] + "_peaks.npz")
+        file = np.load("../data/pdf_" + experiment_type[i] + "_peaks.npz")
         p_ori = 0  # starting position index in original experiment.
         p_tracked = (
             0  # starting position index in previous experiments in Tracked Peak Matrix.

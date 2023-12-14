@@ -15,6 +15,7 @@ import numpy as np
 from Determine_Analytes import get_analyte_data
 from Extract_Data import get_gr_files
 from Integrate_Peaks import peak_integration
+from Peak_Tracking import track_peaks
 from Plot_PDFs import Plot_multiple_PDFs
 from Plot_Total_Peaks import plot_total_peaks
 from Read_Log_File import extract_time_temp_data
@@ -153,6 +154,7 @@ def create_report(file_path):
             '<a name="page4"/>Section 3: Quantifying Peak Positions', styles["Heading1"]
         )
     )
+    track_peaks(20)
     story.append(
         Paragraph(
             "The results of quanitfying peak postions are in text file called tracked_peak_matrix.txt in the data folder!",
