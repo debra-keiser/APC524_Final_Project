@@ -29,7 +29,7 @@ Input log.txt and .gr files are stored in data/ and data/gr_files, respectively.
 src/Plot_Total_Peaks.py, src/Plot_PDFs.py, src/Peak_Tracking.py, and src/Integrate_Peaks.py may also be run as standalone scripts after Create_Report.py has been executed once.
 
 ## User Input
-src/Peak_Tracking.py requires that the user indicates which PDF file(s) they are interested in analyzing by lising the corresponding key(s) in data/user_input.txt (do not move/remove "finish" from the end of the file).
+src/Peak_Tracking.py requires that the user indicates which PDF file(s) they are interested in analyzing by listing the corresponding key(s) in data/user_input.txt (do not move/remove "finish" from the end of the file).
 
 Example syntax:
 ramp,1000_00
