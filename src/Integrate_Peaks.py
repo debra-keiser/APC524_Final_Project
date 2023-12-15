@@ -2,7 +2,7 @@
 Integrate_Peaks
 
 Author: Debra Keiser
-Date Modified: 14DEC2023
+Date Modified: 15DEC2023
 
 Description:
 This script integrates, standardizes, and calculates differences between PDF peaks from dwell temperature data to observe how atomic coorindation number changes with increasing temperature.
@@ -56,13 +56,13 @@ def peak_integration(npz_file_and_directory, save_path):
 
     # Compute differences between integrals of the same peak at variable dwell temperatures.
     (
-        number_of_integrated_peaks,
+        reference_peak_positions_list,
         dwell_peak_integral_differences_dict,
     ) = peak_integral_differences(dwell_peaks_dict, dwell_peak_integrals_dict)
 
     # Create a table to store display peak integral changes.
     create_table(
-        number_of_integrated_peaks,
+        reference_peak_positions_list,
         dwell_peak_integrals_dict,
         dwell_peak_integral_differences_dict,
         save_path,
@@ -137,9 +137,8 @@ def peak_integral_differences(peaks_dict, peak_integrals_dict):
         peaks_dict = Dictionary of peak positions, within which keys are dwell temperatures and values are NumPy arrays of positions.
         peak_integrals_dict = Dictionary of peak integrals, within which keys are dwell temperatures and values are NumPy arrays of scaled definite integrals.
     Returns:
-        Dictionary of reference peak integrals, dictionary of peak integral differences with respect to the reference.
-        Keys are positions and values are definite integrals in the reference dictionary.
-        Keys are dwell temperatures greater than the reference and values are NumPy arrays of computed differences in the differences dictionary.
+        List of peak positions that constitute the PDF at the reference dwell temperature.
+        Dictionary of peak integral differences with respect to the reference within which keys are dwell temperatures greater than the reference and values are NumPy arrays of computed differences.
     """
     # Set the first dwell temperature as the reference.
     reference_dwell_temperature = next(iter(peak_integrals_dict.keys()))
@@ -172,7 +171,7 @@ def peak_integral_differences(peaks_dict, peak_integrals_dict):
                 dwell_temperature
             ] = integral_differences_list
 
-    return len(reference_peak_positions), peak_integral_differences_dict
+    return reference_peak_positions, peak_integral_differences_dict
 
 
 def subtract_integrals(
@@ -215,19 +214,23 @@ def subtract_integrals(
 
 
 def create_table(
-    n_integrated_peaks, peak_integrals_dict, peak_integral_differences_dict, save_path
+    reference_peak_positions,
+    peak_integrals_dict,
+    peak_integral_differences_dict,
+    save_path,
 ):
     """
     Create a table that contains computed changes in peak integrals with respect to the reference dwell temperature and integrals.
     The reference dwell temperature is listed first and shows no integral change (i.e., 0) for each peak.
     Args:
-        n_integrated_peaks = Total number of peaks identified and integrated at the reference dwell temperature.
-        peak_integrals_dict = List of peak positions at the reference dwell temperature.
-        peak_integral_differences_dict = Dictionary of reference integrals within which keys are peak positions and values are definite integrals.
+        reference_peak_positions = List of peak positions at the reference dwell temperature.
+        peak_integrals_dict = Dictionary of peak integrals, within which keys are dwell temperatures and values are NumPy arrays of scaled definite integrals.
+        peak_integral_differences_dict = Dictionary of peak integral differences with respect to the reference within which keys are dwell temperatures greater than the reference and values are NumPy arrays of computed differences.
+        save_path = File path to the location of the compiled table.
     Returns:
-        Prints a PNG file containing the table to the specified directory.
+        Saves a PNG file containing the table in the specified directory.
     """
-    dwell_peak_integral_differences_matrix = [[0] * n_integrated_peaks]
+    dwell_peak_integral_differences_matrix = [[0] * len(reference_peak_positions)]
     df_row_names = [f"{int(next(iter(peak_integrals_dict.keys()))):n}\u00B0C"]
     df_column_names = []
     for dwell_temperature in peak_integral_differences_dict:
@@ -236,8 +239,10 @@ def create_table(
         )
         df_row_names.append(f"{int(dwell_temperature):n}\u00B0C")
 
-    for peak in range(n_integrated_peaks):
-        df_column_names.append(f"Peak {peak + 1:n}")
+    for peak in range(len(reference_peak_positions)):
+        df_column_names.append(
+            f"Peak {peak + 1:n} (~{float(reference_peak_positions[peak]) / 100:0.2f}\u00C5)"
+        )
 
     df = pd.DataFrame.from_records(dwell_peak_integral_differences_matrix)
     df.index = df_row_names
@@ -251,3 +256,4 @@ def create_table(
         save_path,
         bbox_inches="tight",
     )
+    plt.close()
