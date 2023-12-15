@@ -2,7 +2,7 @@
 Read_Log_File
 
 Author: Debra Keiser
-Date Modified: 09DEC2023
+Date Modified: 15DEC2023
 
 Description:
 This script reads the log.txt file and extracts relevant details of experiment progress.
@@ -18,6 +18,7 @@ def extract_time_temp_data(file_directory, file_to_read):
     """
     Read a file line-by-line and extract time and temperature identifiers from each line.
     Args:
+        file_directory = Directory in which the file_to_read is stored.
         file_to_read: File to be parsed/read.
     Returns:
         List of times, list of temperatures, list of rounded temperatures at which PDF data was recorded.
