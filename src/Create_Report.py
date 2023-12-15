@@ -2,7 +2,7 @@
 Create_Report
 
 Author: Sophia Bergen and Debra Keiser
-Date Modified: 14DEC2023
+Date Modified: 15DEC2023
 
 Description:
 This script retrieves PDF data, saves peak positions, and generates a portable document file displaying the results of various PDF analysis functions.
@@ -154,13 +154,18 @@ def create_report(file_path):
             '<a name="page4"/>Section 3: Quantifying Peak Positions', styles["Heading1"]
         )
     )
-    track_peaks(20)
     story.append(
         Paragraph(
-            "The results of quanitfying peak postions are in text file called tracked_peak_matrix.txt in the data folder!",
+            "This table shows select peak positions, in Angstroms, tracked across PDFs recorded at various temperatures. Full results of tracked peak postions are shown in tracked_peak_matrix.txt.",
             styles["Normal"],
         )
     )
+    track_peaks(20)
+    img = Image("../data/images/selected_tracked_peak_matrix.png")
+
+    img.drawWidth = 600
+    img.drawHeight = 400
+    story.append(img)
     story.append(PageBreak())
 
     # SECTION 4: PEAK INTEGRATION
