@@ -2,7 +2,7 @@
 Read_User_Input
 
 Author: Meddelin Setiawan
-Date Modified: 08DEC2023
+Date Modified: 15DEC2023
 
 Description:
 This script reads user_input.txt to feed any functions with PDF files intended to be analyzed.
@@ -15,7 +15,7 @@ def read_user_input():
     experiment_type = np.array([])
     temperature_point = np.array([])
 
-    with open("./src/user_input.txt") as file:
+    with open("../data/user_input.txt") as file:
         for line in file.readlines()[:-1]:
             fields = line.strip().split(",")
             experiment_type = np.append(experiment_type, fields[0])

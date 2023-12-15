@@ -2,13 +2,16 @@
 Peak_Tracking
 
 Author: Meddelin Setiawan
-Date Modified: 13DEC2023
+Date Modified: 15DEC2023
 
 Description:
 This script produces a matrix where each peak are tracked across different experiments. The matrix is saved in "tracked_peak_matrix.txt"
 """
 
+import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+from pandas.plotting import table
 from tabulate import tabulate
 
 from src.Read_User_Input import read_user_input
@@ -150,8 +153,30 @@ def track_peaks(threshold_distance: float):
     with open("../data/tracked_peak_matrix.txt", "w") as file:
         file.write(tracked_table)
 
-    print(
-        "Peak tracking is successful! The matrix containing tracked peaks has been saved as tracked_peak_matrix.txt in 'data' folder!"
+    df = pd.DataFrame.from_records(tracked_matrix_list)
+    df.columns = headers
+    df.index = [
+        "30\u00B0C",
+        "100\u00B0C",
+        "200\u00B0C",
+        "300\u00B0C",
+        "400\u00B0C",
+        "500\u00B0C",
+        "600\u00B0C",
+        "700\u00B0C",
+        "800\u00B0C",
+        "900\u00B0C",
+    ]
+    ax = plt.subplot(111, frame_on=False)
+    ax.axis("off")
+    ax.set_title("Tracked Peak Positions for Selected PDF Peaks")
+    table(ax, df.iloc[0:10, 1:9], loc="upper center")
+    plt.tight_layout()
+    plt.savefig(
+        "../data/images/selected_tracked_peak_matrix.png",
+        bbox_inches="tight",
+        orientation="landscape",
     )
+    plt.close()
 
     return "tracked_peak_matrix.txt"
